@@ -9,7 +9,7 @@ export { FilesApi } from './api/files.js';
 export { SubtasksApi } from './api/subtasks.js';
 export { UsersApi } from './api/users.js';
 export { loadConfig, parseEnvFile } from './config.js';
-export { KaitenApiError, KaitenClient } from './http/index.js';
+export { KaitenApiError, KaitenClient, KaitenDeleteDisabledError } from './http/index.js';
 export type { KaitenClientOptions, QueryParams } from './http/index.js';
 export type {
   Board,

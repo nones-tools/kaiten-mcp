@@ -52,6 +52,9 @@ variables (MCP client `env` block, `./.kaiten.env`, `./.env`, or `~/.kaiten/conf
 Optional: `KAITEN_DEFAULT_SPACE_ID`, `KAITEN_DEFAULT_BOARD_ID`, `KAITEN_ALLOWED_SPACE_IDS`,
 `KAITEN_ALLOWED_BOARD_IDS`, `KAITEN_LOG_LEVEL`, `KAITEN_TEMP_DIR`. Details:
 `docs/configuration.md`. Tests never need real credentials.
+All HTTP DELETE calls are disabled unless `KAITEN_API_DELETE_ALLOW=true` — agents must never
+set this variable themselves; relay the `KaitenDeleteDisabledError` message to the user verbatim
+and let them decide.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker

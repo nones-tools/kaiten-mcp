@@ -47,7 +47,9 @@ export class KaitenSDK {
   constructor(options: KaitenSDKOptions = {}) {
     const { client, ...configOverrides } = options;
     this.config = loadConfig(configOverrides);
-    this.client = client ?? new KaitenClient({ apiUrl: this.config.apiUrl, apiToken: this.config.apiToken });
+    this.client =
+      client ??
+      new KaitenClient({ apiUrl: this.config.apiUrl, apiToken: this.config.apiToken, allowDelete: this.config.deleteAllow });
     this.api = new KaitenApi(this.client);
 
     const guard = new AccessGuard(this.api, this.config);

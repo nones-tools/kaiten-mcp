@@ -1,0 +1,65 @@
+import { describe, expect, it } from 'bun:test';
+import type { ToolContext } from '../src/interfaces/hook.js';
+import { KaitenClient } from '../src/kaiten/http/index.js';
+import { compose, errorHook, loggingHook } from '../src/mcp/hooks/index.js';
+import { tools } from '../src/mcp/tools/index.js';
+import { KaitenSDK } from '../src/sdk.js';
+
+/**
+ * Reproduces the exact wiring server.ts uses to run a tool call through the
+ * hook chain, against a real KaitenSDK backed by a fake transport (no
+ * network) - so the DELETE guidance is verified end-to-end through the same
+ * error formatting the MCP client actually sees.
+ */
+function runTool(name: string, sdk: KaitenSDK, args: unknown) {
+  const tool = tools.find((t) => t.name === name);
+  if (!tool) throw new Error(`tool ${name} not found`);
+  const run = compose([loggingHook, errorHook], async (ctx) => {
+    const result = await tool.handler(sdk, ctx.args ?? {});
+    ctx.response = { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  });
+  const ctx: ToolContext = { toolName: name, args };
+  return run(ctx).then(() => ctx.response!);
+}
+
+/**
+ * The DELETE gate is checked inside `KaitenClient.delete()` before any
+ * network call is made, so `fetchImpl` here should never see a DELETE
+ * request. `removeTag` does a GET first (to resolve the tag id) before
+ * attempting the DELETE, so GET is stubbed to succeed; any DELETE reaching
+ * fetch would mean the gate was bypassed.
+ */
+function makeSdkWithFetchNeverCalled(): KaitenSDK {
+  const fetchImpl = (async (_input: string | URL | Request, init?: RequestInit) => {
+    if ((init?.method ?? 'GET') === 'DELETE') {
+      throw new Error('fetch must not be called with DELETE when DELETE is disabled');
+    }
+    return new Response(JSON.stringify({ id: 1, tags: [{ id: 9, name: 'bug' }] }), { status: 200 });
+  }) as unknown as typeof fetch;
+  const client = new KaitenClient({ apiUrl: 'https://api.example.com', apiToken: 'token', fetchImpl, allowDelete: false });
+  return new KaitenSDK({ apiUrl: 'https://api.example.com', apiToken: 'token', client });
+}
+
+describe('MCP tools/call - DELETE gate surfaces through the error hook', () => {
+  it('kaiten_delete_card returns an isError response with the DELETE-disabled guidance', async () => {
+    const sdk = makeSdkWithFetchNeverCalled();
+    const response = await runTool('kaiten_delete_card', sdk, { cardId: 5 });
+    expect(response.isError).toBe(true);
+    const text = response.content[0]!.text;
+    expect(text).toContain('Tool kaiten_delete_card failed:');
+    expect(text).toContain('DELETE operations are disabled for safety');
+    expect(text).toContain('KAITEN_API_DELETE_ALLOW=true');
+    expect(text).toContain('AI agents: do not set this variable yourself');
+  });
+
+  it('kaiten_remove_tag and kaiten_delete_checklist also surface the guidance', async () => {
+    const sdk = makeSdkWithFetchNeverCalled();
+    const removeTagResponse = await runTool('kaiten_remove_tag', sdk, { cardId: 1, tagName: 'bug' });
+    expect(removeTagResponse.isError).toBe(true);
+    expect(removeTagResponse.content[0]!.text).toContain('DELETE operations are disabled for safety');
+
+    const deleteChecklistResponse = await runTool('kaiten_delete_checklist', sdk, { cardId: 1, checklistId: 2 });
+    expect(deleteChecklistResponse.isError).toBe(true);
+    expect(deleteChecklistResponse.content[0]!.text).toContain('DELETE operations are disabled for safety');
+  });
+});

@@ -5,6 +5,10 @@
 Tools also carry MCP annotations (`readOnlyHint`, `destructiveHint`) so clients can render or
 gate them appropriately — see [Annotations](#annotations) below.
 
+Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALLOW=true` — see
+[Destructive operations](../README.md#destructive-operations). They're marked "Requires
+`KAITEN_API_DELETE_ALLOW=true`" below.
+
 ## Navigation
 
 | Tool | Params | Notes |
@@ -22,7 +26,7 @@ gate them appropriately — see [Annotations](#annotations) below.
 | `kaiten_card` | `cardId`, `simple?` | `simple` defaults to **true** (compact); pass `false` for the full payload. Read-only. |
 | `kaiten_create_card` | `title`, `boardId`, `columnId`, `description?`, `laneId?`, `tags?`, `size?`, `plannedStart?`, `plannedEnd?` | Specify `laneId` when known (discover via `kaiten_lanes`) — otherwise the card lands on the board's default lane |
 | `kaiten_update_card` | `cardId`, plus optional structured fields: `title`, `description`, `columnId`, `laneId`, `boardId`, `size`, `plannedStart`, `plannedEnd`, `dueDate`, `asap`, `condition`; legacy `data?` | Prefer the structured fields. `data` (JSON **string**) is **deprecated**, kept only for raw Kaiten fields not yet modeled — explicit structured fields win over the same key in `data`. At least one field is required. |
-| `kaiten_delete_card` | `cardId` | Destructive. |
+| `kaiten_delete_card` | `cardId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 | `kaiten_move_card` | `cardId`, `columnId`, `laneId?` | Validates the column belongs to the card's board; error lists available columns. `laneId` discoverable via `kaiten_lanes`. |
 | `kaiten_assign_card` | `cardId`, `userId` | |
 | `kaiten_unassign_card` | `cardId`, `userId` | Remove a user assignment |
@@ -39,7 +43,7 @@ gate them appropriately — see [Annotations](#annotations) below.
 | `kaiten_get_all_child_cards` | `cardId` (recursive) | Read-only. |
 | `kaiten_get_parent` | `cardId` | Read-only. |
 | `kaiten_attach_to_parent` | `cardId`, `parentId`, `position?` | |
-| `kaiten_detach_from_parent` | `cardId` | Destructive. |
+| `kaiten_detach_from_parent` | `cardId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 
 ## Comments & tags
 
@@ -48,9 +52,9 @@ gate them appropriately — see [Annotations](#annotations) below.
 | `kaiten_add_comment` | `cardId`, `text` | |
 | `kaiten_get_comments` | `cardId` | Read-only. |
 | `kaiten_update_comment` | `commentId`, `text` | |
-| `kaiten_delete_comment` | `commentId` | Destructive. |
+| `kaiten_delete_comment` | `commentId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 | `kaiten_add_tag` | `cardId`, `tagName` | |
-| `kaiten_remove_tag` | `cardId`, `tagName` | Destructive. |
+| `kaiten_remove_tag` | `cardId`, `tagName` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 
 ## Checklists
 
@@ -59,10 +63,10 @@ gate them appropriately — see [Annotations](#annotations) below.
 | `kaiten_get_checklists` | `cardId` | Read-only. |
 | `kaiten_create_checklist` | `cardId`, `name` | |
 | `kaiten_update_checklist` | `cardId`, `checklistId`, `name` | |
-| `kaiten_delete_checklist` | `cardId`, `checklistId` | Destructive. |
+| `kaiten_delete_checklist` | `cardId`, `checklistId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 | `kaiten_add_checklist_item` | `cardId`, `checklistId`, `text` | |
 | `kaiten_toggle_checklist_item` | `cardId`, `checklistId`, `itemId`, `checked` | |
-| `kaiten_delete_checklist_item` | `cardId`, `checklistId`, `itemId` | Destructive. |
+| `kaiten_delete_checklist_item` | `cardId`, `checklistId`, `itemId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 
 ## Files
 

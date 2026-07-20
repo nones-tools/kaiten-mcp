@@ -113,7 +113,7 @@ export const cardTools: ToolDef[] = [
   },
   {
     name: 'kaiten_delete_card',
-    description: 'Delete a card',
+    description: 'Delete a card. Requires KAITEN_API_DELETE_ALLOW=true.',
     annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),

@@ -34,7 +34,7 @@ export const tagTools: ToolDef[] = [
   },
   {
     name: 'kaiten_remove_tag',
-    description: 'Remove tag from card',
+    description: 'Remove tag from card. Requires KAITEN_API_DELETE_ALLOW=true.',
     annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
@@ -60,7 +60,7 @@ export const newCommentTools: ToolDef[] = [
   },
   {
     name: 'kaiten_delete_comment',
-    description: 'Delete a comment',
+    description: 'Delete a comment. Requires KAITEN_API_DELETE_ALLOW=true.',
     annotations: { destructiveHint: true },
     inputSchema: {
       commentId: z.number().describe('Comment ID'),

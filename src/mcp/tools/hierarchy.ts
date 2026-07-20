@@ -51,7 +51,8 @@ export const hierarchyTools: ToolDef[] = [
   },
   {
     name: 'kaiten_detach_from_parent',
-    description: 'Remove parent-child relationship - makes a subtask/child card into an independent card',
+    description:
+      'Remove parent-child relationship - makes a subtask/child card into an independent card. Requires KAITEN_API_DELETE_ALLOW=true.',
     annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),

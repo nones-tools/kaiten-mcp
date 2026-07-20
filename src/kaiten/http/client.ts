@@ -1,10 +1,18 @@
 import type { HttpTransport, QueryParams } from '../interfaces/http.js';
-import { KaitenApiError } from './errors.js';
+import { KaitenApiError, KaitenDeleteDisabledError } from './errors.js';
 
 export interface KaitenClientOptions {
   apiUrl: string;
   apiToken: string;
   fetchImpl?: typeof fetch;
+  /**
+   * Explicit opt-in for HTTP DELETE calls. Defaults to `false` - `delete()`
+   * throws `KaitenDeleteDisabledError` before making any request unless this
+   * is `true`. This is the single enforcement point: every DELETE anywhere
+   * in the API layer goes through `KaitenClient.delete()`, so nothing can
+   * bypass the gate.
+   */
+  allowDelete?: boolean;
 }
 
 export type { QueryParams } from '../interfaces/http.js';
@@ -14,11 +22,13 @@ export class KaitenClient implements HttpTransport {
   private readonly apiUrl: string;
   private readonly apiToken: string;
   private readonly fetchImpl: typeof fetch;
+  private readonly allowDelete: boolean;
 
   constructor(options: KaitenClientOptions) {
     this.apiUrl = options.apiUrl.replace(/\/+$/, '');
     this.apiToken = options.apiToken;
     this.fetchImpl = options.fetchImpl ?? globalThis.fetch;
+    this.allowDelete = options.allowDelete ?? false;
   }
 
   private buildUrl(path: string, query?: QueryParams): string {
@@ -88,7 +98,8 @@ export class KaitenClient implements HttpTransport {
     return this.request<T>('PATCH', path, { body });
   }
 
-  delete<T>(path: string): Promise<T> {
+  async delete<T>(path: string): Promise<T> {
+    if (!this.allowDelete) throw new KaitenDeleteDisabledError();
     return this.request<T>('DELETE', path);
   }
 

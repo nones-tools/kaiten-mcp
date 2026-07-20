@@ -39,6 +39,10 @@ const kids = await sdk.getAllSubtasks(cardId, /* minimal */ true);
 
 Errors from the Kaiten API throw `KaitenApiError` with `status` and parsed `body`.
 
+DELETE-backed methods (`deleteCard`, `deleteChecklist`, `deleteChecklistItem`, `deleteComment`,
+`removeTag`, `detachFromParent`) throw `KaitenDeleteDisabledError` unless `KAITEN_API_DELETE_ALLOW=true`
+is set — see [Destructive operations](../README.md#destructive-operations).
+
 ## Lower level
 
 For direct endpoint access without SDK conveniences (allowlists, projections):
@@ -47,7 +51,7 @@ For direct endpoint access without SDK conveniences (allowlists, projections):
 import { KaitenClient, KaitenApi, loadConfig } from '@nones/kaiten-mcp';
 
 const config = loadConfig();
-const client = new KaitenClient({ apiUrl: config.apiUrl, apiToken: config.apiToken });
+const client = new KaitenClient({ apiUrl: config.apiUrl, apiToken: config.apiToken, allowDelete: config.deleteAllow });
 const api = new KaitenApi(client);
 const spaces = await api.boards.getSpaces();
 ```

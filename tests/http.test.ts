@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { KaitenApiError, KaitenClient } from '../src/kaiten/http/index.js';
 
+// allowDelete: true by default here - this file tests the client's request
+// shaping across HTTP methods, not the DELETE gate. The gate has its own
+// dedicated coverage in tests/http-delete-gate.test.ts.
 function makeClient(fetchImpl: typeof fetch, apiUrl = 'https://api.example.com'): KaitenClient {
-  return new KaitenClient({ apiUrl, apiToken: 'test-token', fetchImpl });
+  return new KaitenClient({ apiUrl, apiToken: 'test-token', fetchImpl, allowDelete: true });
 }
 
 describe('KaitenClient', () => {

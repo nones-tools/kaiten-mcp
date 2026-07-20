@@ -69,6 +69,7 @@ export function loadConfig(overrides: Partial<KaitenConfig> = {}): KaitenConfig 
     allowedSpaceIds: parseIntList(merged.KAITEN_ALLOWED_SPACE_IDS),
     allowedBoardIds: parseIntList(merged.KAITEN_ALLOWED_BOARD_IDS),
     logLevel: (merged.KAITEN_LOG_LEVEL as KaitenConfig['logLevel']) || 'info',
+    deleteAllow: (merged.KAITEN_API_DELETE_ALLOW ?? '').toLowerCase() === 'true',
     ...overrides,
   };
 

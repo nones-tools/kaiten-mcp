@@ -31,6 +31,13 @@ export function createFakeFetch(responses: Canned[]) {
   return { fetchImpl, calls };
 }
 
+/**
+ * `allowDelete: true` by default - these API-layer tests exercise request
+ * shaping (paths, methods, bodies) on the resource classes, not the DELETE
+ * gate itself. The gate has its own dedicated coverage in
+ * tests/http-delete-gate.test.ts, tests/sdk-delete-gate.test.ts and
+ * tests/mcp-delete-gate.test.ts.
+ */
 export function makeClient(fetchImpl: typeof fetch): KaitenClient {
-  return new KaitenClient({ apiUrl: 'https://api.example.com', apiToken: 'token', fetchImpl });
+  return new KaitenClient({ apiUrl: 'https://api.example.com', apiToken: 'token', fetchImpl, allowDelete: true });
 }

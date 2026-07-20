@@ -21,6 +21,7 @@ All files use plain `KEY=VALUE` lines; `#` starts a comment.
 | `KAITEN_ALLOWED_BOARD_IDS` | no | Comma-separated allowlist; operations outside it are rejected |
 | `KAITEN_LOG_LEVEL` | no | `error` \| `warn` \| `info` (default) \| `debug` — logs go to stderr |
 | `KAITEN_TEMP_DIR` | no | Directory for downloaded card files (default `/tmp/kaiten`) |
+| `KAITEN_API_DELETE_ALLOW` | no | Set to `true` to enable DELETE tools (default disabled — see [Destructive operations](../README.md#destructive-operations)) |
 
 ## Examples
 
@@ -43,6 +44,17 @@ KAITEN_DEFAULT_BOARD_ID=67890
 When `KAITEN_ALLOWED_SPACE_IDS` / `KAITEN_ALLOWED_BOARD_IDS` are set, every operation is
 validated against them: listing spaces filters to allowed ones, and card operations check
 the card's board. Useful to keep an AI agent scoped to one project's boards.
+
+## Destructive operations (DELETE gate)
+
+Every HTTP DELETE call to the Kaiten API (`kaiten_delete_card`, `kaiten_delete_checklist`,
+`kaiten_delete_checklist_item`, `kaiten_delete_comment`, `kaiten_remove_tag`,
+`kaiten_detach_from_parent`) is disabled by default. Calling one throws an actionable error
+unless `KAITEN_API_DELETE_ALLOW` is set to exactly `true` (case-insensitive) — any other value,
+including unset, keeps DELETE disabled. This is enforced at the HTTP client layer, so it cannot
+be bypassed by any tool, service, or SDK method. See the README's
+[Destructive operations](../README.md#destructive-operations) section for how to enable it.
+`kaiten_clean_temp` is unaffected — it only deletes local temp files, never Kaiten data.
 
 ## Missing configuration
 
