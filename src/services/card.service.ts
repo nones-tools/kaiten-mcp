@@ -15,6 +15,7 @@ export interface CreateCardInput {
   plannedStart?: string;
   plannedEnd?: string;
   parentId?: number | null;
+  typeId?: number;
 }
 
 export class CardService {
@@ -40,7 +41,7 @@ export class CardService {
   }
 
   async createCard(input: CreateCardInput): Promise<Card> {
-    const { title, description, boardId, columnId, laneId, tags, size, plannedStart, plannedEnd, parentId = null } = input;
+    const { title, description, boardId, columnId, laneId, tags, size, plannedStart, plannedEnd, parentId = null, typeId } = input;
     this.guard.validateBoardId(boardId);
     const data: Record<string, unknown> = {
       title,
@@ -55,6 +56,7 @@ export class CardService {
     if (plannedStart) data.planned_start = plannedStart;
     if (plannedEnd) data.planned_end = plannedEnd;
     if (parentId) data.parent_id = parentId;
+    if (typeId) data.type_id = typeId;
 
     return this.api.cards.createCard(data);
   }

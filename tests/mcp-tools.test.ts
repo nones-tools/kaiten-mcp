@@ -19,6 +19,10 @@ import { tools } from '../src/mcp/tools/index.js';
  * `kaiten_update_card` gained optional structured fields alongside the
  * legacy `data` string, which is why `data` (and `cardId` alone) is now
  * sufficient - see the "required params match" test below.
+ *
+ * 3.2.0 note: 13 more additive tools are appended after the 3.1.0 six -
+ * time logs, card blockers, external links, company dictionaries, the
+ * current user, and a file-upload tool. Same additive-contract rule applies.
  */
 const OLD_TOOLS: { name: string; required: string[] }[] = [
   { name: 'kaiten_spaces', required: [] },
@@ -67,6 +71,20 @@ const OLD_TOOLS: { name: string; required: string[] }[] = [
   { name: 'kaiten_archive_card', required: ['cardId'] },
   { name: 'kaiten_unarchive_card', required: ['cardId'] },
   { name: 'kaiten_unassign_card', required: ['cardId', 'userId'] },
+  // --- 3.2.0 additive tools, appended after the 45 above ---
+  { name: 'kaiten_current_user', required: [] },
+  { name: 'kaiten_tags', required: [] },
+  { name: 'kaiten_card_types', required: [] },
+  { name: 'kaiten_custom_properties', required: [] },
+  { name: 'kaiten_get_time_logs', required: ['cardId'] },
+  { name: 'kaiten_add_time_log', required: ['cardId', 'timeSpent', 'forDate', 'roleId'] },
+  { name: 'kaiten_get_blockers', required: ['cardId'] },
+  { name: 'kaiten_block_card', required: ['cardId'] },
+  { name: 'kaiten_unblock_card', required: ['cardId', 'blockerId'] },
+  { name: 'kaiten_get_external_links', required: ['cardId'] },
+  { name: 'kaiten_add_external_link', required: ['cardId', 'url'] },
+  { name: 'kaiten_remove_external_link', required: ['cardId', 'linkId'] },
+  { name: 'kaiten_attach_file', required: ['cardId', 'filePath'] },
 ];
 
 function toolByName(name: string) {
@@ -128,13 +146,26 @@ function makeStubSdk(overrides: Record<string, (...args: any[]) => any> = {}): K
     archive: mock(async () => ({ id: 1 })),
     unarchive: mock(async () => ({ id: 1 })),
     unassignFrom: mock(async () => ({ id: 1 })),
+    getCurrentUser: mock(async () => ({ id: 1, full_name: 'Me' })),
+    listTags: mock(async () => []),
+    getCardTypes: mock(async () => []),
+    getCustomProperties: mock(async () => []),
+    getTimeLogs: mock(async () => []),
+    addTimeLog: mock(async () => ({ id: 1 })),
+    getBlockers: mock(async () => []),
+    blockCard: mock(async () => ({ id: 1 })),
+    unblockCard: mock(async () => ({ ok: true })),
+    getExternalLinks: mock(async () => []),
+    addExternalLink: mock(async () => ({ id: 1 })),
+    removeExternalLink: mock(async () => ({ ok: true })),
+    attachFile: mock(async () => ({ id: 1 })),
   };
   return { ...base, ...overrides } as unknown as KaitenSDK;
 }
 
 describe('mcp tool registry', () => {
-  test('has exactly 45 tools (39 frozen legacy + 6 additive in 3.1.0)', () => {
-    expect(tools).toHaveLength(45);
+  test('has exactly 58 tools (45 existing + 13 additive in 3.2.0)', () => {
+    expect(tools).toHaveLength(58);
   });
 
   test('tool names match the old server list exactly, in order', () => {
@@ -522,17 +553,158 @@ describe('mcp tool handlers - 3.1.0 additive tools', () => {
   });
 });
 
+describe('mcp tool handlers - 3.2.0 additive tools', () => {
+  test('kaiten_create_card passes typeId through to sdk.createCard', async () => {
+    const createCard = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ createCard });
+    await toolByName('kaiten_create_card').handler(sdk, { title: 'T', boardId: 1, columnId: 2, typeId: 3 });
+    expect(createCard).toHaveBeenCalledWith(expect.objectContaining({ typeId: 3 }));
+  });
+
+  test('kaiten_current_user delegates to sdk.getCurrentUser with no args', async () => {
+    const getCurrentUser = mock(async () => ({ id: 1, full_name: 'Me' }));
+    const sdk = makeStubSdk({ getCurrentUser });
+    const result = await toolByName('kaiten_current_user').handler(sdk, {});
+    expect(getCurrentUser).toHaveBeenCalledWith();
+    expect(result).toEqual({ id: 1, full_name: 'Me' });
+  });
+
+  test('kaiten_tags delegates to sdk.listTags(query, spaceId)', async () => {
+    const listTags = mock(async () => [{ id: 1, name: 'bug' }]);
+    const sdk = makeStubSdk({ listTags });
+    await toolByName('kaiten_tags').handler(sdk, { query: 'bug', spaceId: 9 });
+    expect(listTags).toHaveBeenCalledWith('bug', 9);
+  });
+
+  test('kaiten_tags works with no args', async () => {
+    const listTags = mock(async () => []);
+    const sdk = makeStubSdk({ listTags });
+    await toolByName('kaiten_tags').handler(sdk, {});
+    expect(listTags).toHaveBeenCalledWith(undefined, undefined);
+  });
+
+  test('kaiten_card_types delegates to sdk.getCardTypes with no args', async () => {
+    const getCardTypes = mock(async () => [{ id: 1, name: 'Bug' }]);
+    const sdk = makeStubSdk({ getCardTypes });
+    const result = await toolByName('kaiten_card_types').handler(sdk, {});
+    expect(getCardTypes).toHaveBeenCalledWith();
+    expect(result).toEqual([{ id: 1, name: 'Bug' }]);
+  });
+
+  test('kaiten_custom_properties delegates to sdk.getCustomProperties with no args', async () => {
+    const getCustomProperties = mock(async () => [{ id: 1, name: 'Priority' }]);
+    const sdk = makeStubSdk({ getCustomProperties });
+    const result = await toolByName('kaiten_custom_properties').handler(sdk, {});
+    expect(getCustomProperties).toHaveBeenCalledWith();
+    expect(result).toEqual([{ id: 1, name: 'Priority' }]);
+  });
+
+  test('kaiten_get_time_logs delegates to sdk.getTimeLogs(cardId)', async () => {
+    const getTimeLogs = mock(async () => [{ id: 1, time_spent: 30 }]);
+    const sdk = makeStubSdk({ getTimeLogs });
+    await toolByName('kaiten_get_time_logs').handler(sdk, { cardId: 5 });
+    expect(getTimeLogs).toHaveBeenCalledWith(5);
+  });
+
+  test('kaiten_add_time_log delegates to sdk.addTimeLog(cardId, timeSpent, forDate, roleId, comment)', async () => {
+    const addTimeLog = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ addTimeLog });
+    await toolByName('kaiten_add_time_log').handler(sdk, {
+      cardId: 5,
+      timeSpent: 30,
+      forDate: '2026-07-20',
+      roleId: 7,
+      comment: 'debugging',
+    });
+    expect(addTimeLog).toHaveBeenCalledWith(5, 30, '2026-07-20', 7, 'debugging');
+  });
+
+  test('kaiten_get_blockers delegates to sdk.getBlockers(cardId)', async () => {
+    const getBlockers = mock(async () => []);
+    const sdk = makeStubSdk({ getBlockers });
+    await toolByName('kaiten_get_blockers').handler(sdk, { cardId: 5 });
+    expect(getBlockers).toHaveBeenCalledWith(5);
+  });
+
+  test('kaiten_block_card delegates to sdk.blockCard(cardId, reason, blockerCardId)', async () => {
+    const blockCard = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ blockCard });
+    await toolByName('kaiten_block_card').handler(sdk, { cardId: 5, reason: 'waiting', blockerCardId: 9 });
+    expect(blockCard).toHaveBeenCalledWith(5, 'waiting', 9);
+  });
+
+  test('kaiten_unblock_card delegates to sdk.unblockCard(cardId, blockerId)', async () => {
+    const unblockCard = mock(async () => ({ ok: true }));
+    const sdk = makeStubSdk({ unblockCard });
+    await toolByName('kaiten_unblock_card').handler(sdk, { cardId: 5, blockerId: 3 });
+    expect(unblockCard).toHaveBeenCalledWith(5, 3);
+  });
+
+  test('kaiten_get_external_links delegates to sdk.getExternalLinks(cardId)', async () => {
+    const getExternalLinks = mock(async () => []);
+    const sdk = makeStubSdk({ getExternalLinks });
+    await toolByName('kaiten_get_external_links').handler(sdk, { cardId: 5 });
+    expect(getExternalLinks).toHaveBeenCalledWith(5);
+  });
+
+  test('kaiten_add_external_link delegates to sdk.addExternalLink(cardId, url, description)', async () => {
+    const addExternalLink = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ addExternalLink });
+    await toolByName('kaiten_add_external_link').handler(sdk, { cardId: 5, url: 'https://example.com', description: 'PR' });
+    expect(addExternalLink).toHaveBeenCalledWith(5, 'https://example.com', 'PR');
+  });
+
+  test('kaiten_remove_external_link delegates to sdk.removeExternalLink(cardId, linkId)', async () => {
+    const removeExternalLink = mock(async () => ({ ok: true }));
+    const sdk = makeStubSdk({ removeExternalLink });
+    await toolByName('kaiten_remove_external_link').handler(sdk, { cardId: 5, linkId: 3 });
+    expect(removeExternalLink).toHaveBeenCalledWith(5, 3);
+  });
+
+  test('kaiten_attach_file delegates to sdk.attachFile(cardId, filePath, fileName)', async () => {
+    const attachFile = mock(async () => ({ id: 1, name: 'a.txt' }));
+    const sdk = makeStubSdk({ attachFile });
+    await toolByName('kaiten_attach_file').handler(sdk, { cardId: 5, filePath: '/tmp/a.txt', fileName: 'a.txt' });
+    expect(attachFile).toHaveBeenCalledWith(5, '/tmp/a.txt', 'a.txt');
+  });
+});
+
 describe('mcp tool annotations', () => {
   test('read-only tools are marked readOnlyHint: true', () => {
-    for (const name of ['kaiten_spaces', 'kaiten_cards', 'kaiten_card', 'kaiten_lanes', 'kaiten_get_checklists']) {
+    for (const name of [
+      'kaiten_spaces',
+      'kaiten_cards',
+      'kaiten_card',
+      'kaiten_lanes',
+      'kaiten_get_checklists',
+      'kaiten_current_user',
+      'kaiten_tags',
+      'kaiten_card_types',
+      'kaiten_custom_properties',
+      'kaiten_get_time_logs',
+      'kaiten_get_blockers',
+      'kaiten_get_external_links',
+    ]) {
       expect(toolByName(name).annotations?.readOnlyHint).toBe(true);
     }
   });
 
   test('destructive tools are marked destructiveHint: true', () => {
-    for (const name of ['kaiten_delete_card', 'kaiten_delete_comment', 'kaiten_remove_tag', 'kaiten_clean_temp']) {
+    for (const name of [
+      'kaiten_delete_card',
+      'kaiten_delete_comment',
+      'kaiten_remove_tag',
+      'kaiten_clean_temp',
+      'kaiten_unblock_card',
+      'kaiten_remove_external_link',
+    ]) {
       expect(toolByName(name).annotations?.destructiveHint).toBe(true);
     }
+  });
+
+  test('kaiten_unblock_card and kaiten_remove_external_link descriptions require KAITEN_API_DELETE_ALLOW', () => {
+    expect(toolByName('kaiten_unblock_card').description).toContain('KAITEN_API_DELETE_ALLOW=true');
+    expect(toolByName('kaiten_remove_external_link').description).toContain('KAITEN_API_DELETE_ALLOW=true');
   });
 
   test('mutating non-destructive tools carry no annotations by default', () => {

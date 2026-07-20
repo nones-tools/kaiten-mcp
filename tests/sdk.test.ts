@@ -253,6 +253,64 @@ describe('KaitenSDK - hasTag / getTags', () => {
   });
 });
 
+describe('KaitenSDK - 3.2.0 new methods (delegation smoke)', () => {
+  it('getCurrentUser GETs /users/current', async () => {
+    const { sdk, calls } = makeSdk([{ body: { id: 1, full_name: 'Me' } }]);
+    const user = await sdk.getCurrentUser();
+    expect(calls[0]!.url).toBe('https://api.example.com/users/current');
+    expect(user.id).toBe(1);
+  });
+
+  it('listTags GETs /tags with query/spaceId params', async () => {
+    const { sdk, calls } = makeSdk([{ body: [{ id: 1, name: 'bug' }] }]);
+    await sdk.listTags('bug', 9);
+    const url = new URL(calls[0]!.url);
+    expect(url.pathname).toBe('/tags');
+    expect(url.searchParams.get('query')).toBe('bug');
+    expect(url.searchParams.get('space_id')).toBe('9');
+  });
+
+  it('getCardTypes GETs /card-types', async () => {
+    const { sdk, calls } = makeSdk([{ body: [] }]);
+    await sdk.getCardTypes();
+    expect(calls[0]!.url).toBe('https://api.example.com/card-types');
+  });
+
+  it('getCustomProperties GETs /company/custom-properties', async () => {
+    const { sdk, calls } = makeSdk([{ body: [] }]);
+    await sdk.getCustomProperties();
+    expect(calls[0]!.url).toBe('https://api.example.com/company/custom-properties');
+  });
+
+  it('addTimeLog POSTs snake_case body to /cards/{id}/time-logs', async () => {
+    const { sdk, calls } = makeSdk([{ body: { id: 1 } }]);
+    await sdk.addTimeLog(5, 30, '2026-07-20', 7, 'debugging');
+    expect(calls[0]!.method).toBe('POST');
+    expect(calls[0]!.url).toBe('https://api.example.com/cards/5/time-logs');
+    expect(calls[0]!.body).toEqual({ time_spent: 30, for_date: '2026-07-20', role_id: 7, comment: 'debugging' });
+  });
+
+  it('blockCard POSTs to /cards/{id}/blockers', async () => {
+    const { sdk, calls } = makeSdk([{ body: { id: 1 } }]);
+    await sdk.blockCard(5, 'waiting', 9);
+    expect(calls[0]!.url).toBe('https://api.example.com/cards/5/blockers');
+    expect(calls[0]!.body).toEqual({ reason: 'waiting', blocker_card_id: 9 });
+  });
+
+  it('addExternalLink POSTs to /cards/{id}/external-links', async () => {
+    const { sdk, calls } = makeSdk([{ body: { id: 1 } }]);
+    await sdk.addExternalLink(5, 'https://example.com', 'PR');
+    expect(calls[0]!.url).toBe('https://api.example.com/cards/5/external-links');
+    expect(calls[0]!.body).toEqual({ url: 'https://example.com', description: 'PR' });
+  });
+
+  it('createCard passes typeId through as type_id', async () => {
+    const { sdk, calls } = makeSdk([{ body: { id: 1 } }]);
+    await sdk.createCard({ title: 'T', boardId: 1, columnId: 2, typeId: 4 });
+    expect(calls[0]!.body).toMatchObject({ type_id: 4 });
+  });
+});
+
 describe('KaitenSDK - moveToColumn', () => {
   it('returns { success: true, cardId, columnId, laneId } on success', async () => {
     const { sdk, calls } = makeSdk([

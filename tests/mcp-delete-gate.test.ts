@@ -62,4 +62,17 @@ describe('MCP tools/call - DELETE gate surfaces through the error hook', () => {
     expect(deleteChecklistResponse.isError).toBe(true);
     expect(deleteChecklistResponse.content[0]!.text).toContain('DELETE operations are disabled for safety');
   });
+
+  it('3.2.0: kaiten_unblock_card and kaiten_remove_external_link also surface the guidance', async () => {
+    const sdk = makeSdkWithFetchNeverCalled();
+    const unblockResponse = await runTool('kaiten_unblock_card', sdk, { cardId: 1, blockerId: 2 });
+    expect(unblockResponse.isError).toBe(true);
+    expect(unblockResponse.content[0]!.text).toContain('Tool kaiten_unblock_card failed:');
+    expect(unblockResponse.content[0]!.text).toContain('DELETE operations are disabled for safety');
+
+    const removeLinkResponse = await runTool('kaiten_remove_external_link', sdk, { cardId: 1, linkId: 2 });
+    expect(removeLinkResponse.isError).toBe(true);
+    expect(removeLinkResponse.content[0]!.text).toContain('Tool kaiten_remove_external_link failed:');
+    expect(removeLinkResponse.content[0]!.text).toContain('DELETE operations are disabled for safety');
+  });
 });

@@ -1,6 +1,6 @@
 # MCP tools
 
-45 tools, grouped by domain. All responses are JSON in a text content block.
+58 tools, grouped by domain. All responses are JSON in a text content block.
 
 Tools also carry MCP annotations (`readOnlyHint`, `destructiveHint`) so clients can render or
 gate them appropriately — see [Annotations](#annotations) below.
@@ -24,7 +24,7 @@ Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALL
 | --- | --- | --- |
 | `kaiten_cards` | `spaceId?`, `boardId?`, `minimal?` | `minimal: true` → token-optimized projection. Read-only. |
 | `kaiten_card` | `cardId`, `simple?` | `simple` defaults to **true** (compact); pass `false` for the full payload. Read-only. |
-| `kaiten_create_card` | `title`, `boardId`, `columnId`, `description?`, `laneId?`, `tags?`, `size?`, `plannedStart?`, `plannedEnd?` | Specify `laneId` when known (discover via `kaiten_lanes`) — otherwise the card lands on the board's default lane |
+| `kaiten_create_card` | `title`, `boardId`, `columnId`, `description?`, `laneId?`, `tags?`, `size?`, `plannedStart?`, `plannedEnd?`, `typeId?` | Specify `laneId` when known (discover via `kaiten_lanes`) — otherwise the card lands on the board's default lane. `typeId` discoverable via `kaiten_card_types`. |
 | `kaiten_update_card` | `cardId`, plus optional structured fields: `title`, `description`, `columnId`, `laneId`, `boardId`, `size`, `plannedStart`, `plannedEnd`, `dueDate`, `asap`, `condition`; legacy `data?` | Prefer the structured fields. `data` (JSON **string**) is **deprecated**, kept only for raw Kaiten fields not yet modeled — explicit structured fields win over the same key in `data`. At least one field is required. |
 | `kaiten_delete_card` | `cardId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 | `kaiten_move_card` | `cardId`, `columnId`, `laneId?` | Validates the column belongs to the card's board; error lists available columns. `laneId` discoverable via `kaiten_lanes`. |
@@ -76,6 +76,7 @@ Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALL
 | `kaiten_download_file` | `cardId`, `fileId`, `outputDir?` | Default dir `/tmp/kaiten/{cardId}/` |
 | `kaiten_download_all_files` | `cardId`, `outputDir?` | |
 | `kaiten_clean_temp` | `dir?` | Cleans `/tmp/kaiten/…`. Destructive. |
+| `kaiten_attach_file` | `cardId`, `filePath`, `fileName?` | Reads a local file and uploads it as a multipart attachment. `fileName` defaults to the basename of `filePath`. |
 
 ## Users
 
@@ -83,6 +84,40 @@ Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALL
 | --- | --- | --- |
 | `kaiten_users` | — | Read-only. |
 | `kaiten_search_users` | `query` | Read-only. |
+| `kaiten_current_user` | — | The user owning the configured API token. Read-only. |
+
+## Time logs
+
+| Tool | Params | Notes |
+| --- | --- | --- |
+| `kaiten_get_time_logs` | `cardId` | Read-only. |
+| `kaiten_add_time_log` | `cardId`, `timeSpent`, `forDate`, `roleId`, `comment?` | `timeSpent` in minutes, `forDate` is `YYYY-MM-DD`. |
+
+## Card blockers
+
+| Tool | Params | Notes |
+| --- | --- | --- |
+| `kaiten_get_blockers` | `cardId` | Read-only. |
+| `kaiten_block_card` | `cardId`, `reason?`, `blockerCardId?` | |
+| `kaiten_unblock_card` | `cardId`, `blockerId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
+
+## External links
+
+Useful for attaching PR/issue URLs to a card.
+
+| Tool | Params | Notes |
+| --- | --- | --- |
+| `kaiten_get_external_links` | `cardId` | Read-only. |
+| `kaiten_add_external_link` | `cardId`, `url`, `description?` | |
+| `kaiten_remove_external_link` | `cardId`, `linkId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
+
+## Company dictionaries
+
+| Tool | Params | Notes |
+| --- | --- | --- |
+| `kaiten_tags` | `query?`, `spaceId?` | List/search company tags. Read-only. |
+| `kaiten_card_types` | — | Use the returned `id` as `typeId` for `kaiten_create_card`. Read-only. |
+| `kaiten_custom_properties` | — | Custom field definitions. Values are set on cards via `kaiten_update_card`'s legacy `data` with `{"properties": {"id_<propertyId>": value}}`. Read-only. |
 
 ## Git
 
@@ -110,5 +145,9 @@ The registry order is a frozen contract for the first 39 tools (navigation → c
 → hierarchy → tags → git → users → checklists → files, matching the pre-3.0 hand-rolled
 server). 3.1.0 appended 6 new tools at the end of the list — `kaiten_lanes`,
 `kaiten_update_comment`, `kaiten_delete_comment`, `kaiten_archive_card`, `kaiten_unarchive_card`,
-`kaiten_unassign_card` — without reordering or renaming anything that came before. New tools
-are always appended, never interleaved, in future releases too.
+`kaiten_unassign_card` — without reordering or renaming anything that came before. 3.2.0
+appended 13 more at the end — `kaiten_current_user`, `kaiten_tags`, `kaiten_card_types`,
+`kaiten_custom_properties`, `kaiten_get_time_logs`, `kaiten_add_time_log`,
+`kaiten_get_blockers`, `kaiten_block_card`, `kaiten_unblock_card`, `kaiten_get_external_links`,
+`kaiten_add_external_link`, `kaiten_remove_external_link`, `kaiten_attach_file`. New tools are
+always appended, never interleaved, in future releases too.

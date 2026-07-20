@@ -1,6 +1,6 @@
 # AGENTS.md — kaiten-mcp for AI agents
 
-MCP server (45 tools) + CLI + typed SDK for the Kaiten API. Package: `@nones/kaiten-mcp`.
+MCP server (58 tools) + CLI + typed SDK for the Kaiten API. Package: `@nones/kaiten-mcp`.
 Read `specs/000-project/spec.md` for the domain model and `.specify/memory/constitution.md`
 for the non-negotiable rules before making structural changes.
 

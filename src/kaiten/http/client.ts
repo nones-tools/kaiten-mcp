@@ -103,6 +103,31 @@ export class KaitenClient implements HttpTransport {
     return this.request<T>('DELETE', path);
   }
 
+  /**
+   * PUT with a `FormData` body (multipart file upload). Deliberately omits
+   * `Content-Type` - `fetch` derives `multipart/form-data; boundary=...`
+   * from the `FormData` instance itself; setting it manually would drop the
+   * boundary and break the upload.
+   */
+  async putForm<T>(path: string, form: FormData): Promise<T> {
+    const response = await this.fetchImpl(this.buildUrl(path), {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${this.apiToken}`, Accept: 'application/json' },
+      body: form,
+    });
+
+    if (!response.ok) {
+      const errorBody = await this.parseBody(response);
+      throw new KaitenApiError(response.status, errorBody, `Kaiten API request failed: PUT ${path} -> ${response.status}`);
+    }
+
+    if (response.status === 204) return undefined as T;
+
+    const text = await response.text();
+    if (!text) return undefined as T;
+    return JSON.parse(text) as T;
+  }
+
   async getBuffer(path: string): Promise<Buffer> {
     const response = await this.fetchImpl(this.buildUrl(path), {
       method: 'GET',

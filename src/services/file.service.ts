@@ -61,4 +61,19 @@ export class FileService {
   cleanTempDir(cardId: number | null = null): Promise<number> {
     return cleanTempDirFs(cardId);
   }
+
+  /**
+   * Reads a local file and uploads it as the card's attachment. Errors
+   * (e.g. `ENOENT` for a missing `filePath`) propagate as plain `Error`s -
+   * the MCP error hook formats them into the standard
+   * `Tool kaiten_attach_file failed: ...` response, never an uncaught crash.
+   */
+  async attachFile(cardId: number, filePath: string, fileName?: string): Promise<CardFile> {
+    await this.guard.validateCardId(cardId);
+    const data = await fs.readFile(filePath);
+    const name = fileName ?? path.basename(filePath);
+    const form = new FormData();
+    form.append('file', new Blob([data]), name);
+    return this.api.files.attachFile(cardId, form);
+  }
 }

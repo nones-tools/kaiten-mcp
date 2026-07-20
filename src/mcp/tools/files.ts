@@ -50,3 +50,20 @@ export const fileTools: ToolDef[] = [
     },
   },
 ];
+
+/**
+ * 3.2.0 additive file tool - appended at the end of the registry in
+ * tools/index.ts, never interleaved with `fileTools`.
+ */
+export const newFileTools: ToolDef[] = [
+  {
+    name: 'kaiten_attach_file',
+    description: 'Upload a local file and attach it to a card',
+    inputSchema: {
+      cardId: z.number().describe('Card ID'),
+      filePath: z.string().describe('Path to the local file to upload'),
+      fileName: z.string().optional().describe('File name to use on Kaiten (optional, defaults to the basename of filePath)'),
+    },
+    handler: async (sdk, args) => sdk.attachFile(args.cardId, args.filePath, args.fileName),
+  },
+];

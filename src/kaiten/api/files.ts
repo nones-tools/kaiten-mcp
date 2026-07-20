@@ -11,4 +11,9 @@ export class FilesApi {
   downloadFile(cardId: number, fileId: number): Promise<Buffer> {
     return this.client.getBuffer(`/cards/${cardId}/files/${fileId}`);
   }
+
+  /** Multipart upload - the `file` part name is fixed by the Kaiten API. */
+  attachFile(cardId: number, form: FormData): Promise<CardFile> {
+    return this.client.putForm<CardFile>(`/cards/${cardId}/files`, form);
+  }
 }

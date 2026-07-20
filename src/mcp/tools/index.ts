@@ -1,12 +1,16 @@
 import type { ToolDef } from '../../interfaces/tool.js';
+import { blockerTools } from './blockers.js';
 import { cardTools, newCardTools } from './cards.js';
 import { checklistTools } from './checklists.js';
 import { commentTools, newCommentTools, tagTools } from './comments-tags.js';
-import { fileTools } from './files.js';
+import { dictionaryTools } from './dictionaries.js';
+import { fileTools, newFileTools } from './files.js';
 import { gitTools } from './git.js';
 import { hierarchyTools } from './hierarchy.js';
+import { linkTools } from './links.js';
 import { navigationTools, newNavigationTools } from './navigation.js';
-import { userTools } from './users.js';
+import { timeLogTools } from './timelogs.js';
+import { newUserTools, userTools } from './users.js';
 
 export type { ToolDef } from '../../interfaces/tool.js';
 
@@ -17,10 +21,17 @@ export type { ToolDef } from '../../interfaces/tool.js';
  * (comments/tags/hierarchy interleave), so the order is reconstructed here
  * rather than by file layout.
  *
- * 3.1.0 appends 6 additive tools (kaiten_lanes, kaiten_update_comment,
+ * 3.1.0 appended 6 additive tools (kaiten_lanes, kaiten_update_comment,
  * kaiten_delete_comment, kaiten_archive_card, kaiten_unarchive_card,
- * kaiten_unassign_card) after the original 39 - the legacy sequence above is
- * untouched, new tools are only ever appended at the end.
+ * kaiten_unassign_card) after the original 39.
+ *
+ * 3.2.0 appends 13 more additive tools after those 6, in this exact order:
+ * kaiten_current_user, kaiten_tags, kaiten_card_types, kaiten_custom_properties,
+ * kaiten_get_time_logs, kaiten_add_time_log, kaiten_get_blockers,
+ * kaiten_block_card, kaiten_unblock_card, kaiten_get_external_links,
+ * kaiten_add_external_link, kaiten_remove_external_link, kaiten_attach_file.
+ * The 45 tools above are untouched - new tools are only ever appended at the
+ * end, never interleaved.
  */
 export const tools: ToolDef[] = [
   ...navigationTools,
@@ -35,4 +46,10 @@ export const tools: ToolDef[] = [
   ...newNavigationTools,
   ...newCommentTools,
   ...newCardTools,
+  ...newUserTools,
+  ...dictionaryTools,
+  ...timeLogTools,
+  ...blockerTools,
+  ...linkTools,
+  ...newFileTools,
 ];

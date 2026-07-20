@@ -1,17 +1,38 @@
 import { KaitenApi } from './kaiten/api/index.js';
 import { loadConfig, type KaitenConfig } from './kaiten/config.js';
 import { KaitenClient } from './kaiten/http/client.js';
-import type { Board, Card, CardFile, Checklist, ChecklistItem, Column, Comment, Lane, Space, User } from './kaiten/interfaces/index.js';
+import type {
+  Board,
+  Card,
+  CardBlocker,
+  CardFile,
+  CardType,
+  Checklist,
+  ChecklistItem,
+  Column,
+  Comment,
+  CustomProperty,
+  ExternalLink,
+  Lane,
+  Space,
+  Tag,
+  TimeLog,
+  User,
+} from './kaiten/interfaces/index.js';
+import { BlockerService } from './services/blocker.service.js';
 import { BoardService } from './services/board.service.js';
 import { CardService, type CreateCardInput } from './services/card.service.js';
 import { ChecklistService } from './services/checklist.service.js';
 import { CommentService } from './services/comment.service.js';
+import { DictionaryService } from './services/dictionary.service.js';
 import { FileService } from './services/file.service.js';
 import { GitService } from './services/git.service.js';
 import { AccessGuard } from './services/guard.js';
 import { HierarchyService, type TaskFlowTask } from './services/hierarchy.service.js';
+import { LinkService } from './services/link.service.js';
 import type { MinimalCard, MinimalParent, MinimalSubtask, TaggedCard } from './services/projections.js';
 import { TagService } from './services/tag.service.js';
+import { TimeLogService } from './services/timelog.service.js';
 import { UserService } from './services/user.service.js';
 
 export type { CreateCardInput } from './services/card.service.js';
@@ -43,6 +64,10 @@ export class KaitenSDK {
   private readonly git: GitService;
   private readonly files: FileService;
   private readonly checklists: ChecklistService;
+  private readonly timeLogs: TimeLogService;
+  private readonly blockers: BlockerService;
+  private readonly links: LinkService;
+  private readonly dictionaries: DictionaryService;
 
   constructor(options: KaitenSDKOptions = {}) {
     const { client, ...configOverrides } = options;
@@ -62,6 +87,10 @@ export class KaitenSDK {
     this.git = new GitService(this.api);
     this.files = new FileService(this.api, guard);
     this.checklists = new ChecklistService(this.api, guard);
+    this.timeLogs = new TimeLogService(this.api, guard);
+    this.blockers = new BlockerService(this.api, guard);
+    this.links = new LinkService(this.api, guard);
+    this.dictionaries = new DictionaryService(this.api);
   }
 
   // Cards
@@ -140,6 +169,28 @@ export class KaitenSDK {
   toggleChecklistItem(cardId: number, checklistId: number, itemId: number, checked: boolean): Promise<ChecklistItem> { return this.checklists.toggleChecklistItem(cardId, checklistId, itemId, checked); }
   addChecklistItem(cardId: number, checklistId: number, text: string): Promise<ChecklistItem> { return this.checklists.addChecklistItem(cardId, checklistId, text); }
   deleteChecklistItem(cardId: number, checklistId: number, itemId: number): Promise<unknown> { return this.checklists.deleteChecklistItem(cardId, checklistId, itemId); }
+
+  // Company dictionaries
+  listTags(query?: string, spaceId?: number): Promise<Tag[]> { return this.dictionaries.getTags(query, spaceId); }
+  getCardTypes(): Promise<CardType[]> { return this.dictionaries.getCardTypes(); }
+  getCustomProperties(): Promise<CustomProperty[]> { return this.dictionaries.getCustomProperties(); }
+
+  // Time logs
+  getTimeLogs(cardId: number): Promise<TimeLog[]> { return this.timeLogs.getTimeLogs(cardId); }
+  addTimeLog(cardId: number, timeSpent: number, forDate: string, roleId: number, comment?: string): Promise<TimeLog> { return this.timeLogs.addTimeLog(cardId, timeSpent, forDate, roleId, comment); }
+
+  // Card blockers
+  getBlockers(cardId: number): Promise<CardBlocker[]> { return this.blockers.getBlockers(cardId); }
+  blockCard(cardId: number, reason?: string, blockerCardId?: number): Promise<CardBlocker> { return this.blockers.blockCard(cardId, reason, blockerCardId); }
+  unblockCard(cardId: number, blockerId: number): Promise<unknown> { return this.blockers.unblockCard(cardId, blockerId); }
+
+  // External links
+  getExternalLinks(cardId: number): Promise<ExternalLink[]> { return this.links.getExternalLinks(cardId); }
+  addExternalLink(cardId: number, url: string, description?: string): Promise<ExternalLink> { return this.links.addExternalLink(cardId, url, description); }
+  removeExternalLink(cardId: number, linkId: number): Promise<unknown> { return this.links.removeExternalLink(cardId, linkId); }
+
+  // Files - upload
+  attachFile(cardId: number, filePath: string, fileName?: string): Promise<CardFile> { return this.files.attachFile(cardId, filePath, fileName); }
 }
 
 export function createSDK(options?: KaitenSDKOptions): KaitenSDK {

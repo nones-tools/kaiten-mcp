@@ -5,6 +5,56 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## 3.2.0 — 2026-07-20
+
+New Kaiten API coverage, researched against the official docs (https://developers.kaiten.ru/).
+No breaking changes — the 45 tools from 3.1.0 keep their exact names, parameters, order and
+defaults.
+
+### Added
+
+- **`KAITEN_API_DELETE_ALLOW` gate is now applied to every DELETE-backed tool**, including the
+  two new ones below (`kaiten_unblock_card`, `kaiten_remove_external_link`) - all HTTP DELETE
+  calls go through `KaitenClient.delete()`, the single enforcement point, so nothing can bypass
+  it.
+- **Time logs** (`GET`/`POST /cards/{card_id}/time-logs`):
+  - `kaiten_get_time_logs` (`cardId`)
+  - `kaiten_add_time_log` (`cardId`, `timeSpent` in minutes, `forDate` `YYYY-MM-DD`, `roleId`,
+    `comment?`)
+- **Card blockers** (`/cards/{card_id}/blockers`):
+  - `kaiten_get_blockers` (`cardId`)
+  - `kaiten_block_card` (`cardId`, `reason?`, `blockerCardId?`)
+  - `kaiten_unblock_card` (`cardId`, `blockerId`) - destructive, requires
+    `KAITEN_API_DELETE_ALLOW=true`
+- **External links** (`/cards/{card_id}/external-links`) - useful for attaching PR/issue URLs
+  to a card:
+  - `kaiten_get_external_links` (`cardId`)
+  - `kaiten_add_external_link` (`cardId`, `url`, `description?`)
+  - `kaiten_remove_external_link` (`cardId`, `linkId`) - destructive, requires
+    `KAITEN_API_DELETE_ALLOW=true`
+- **Company dictionaries** (read-only, no space/board/card scoping):
+  - `kaiten_tags` (`query?`, `spaceId?`) - `GET /tags`
+  - `kaiten_card_types` - `GET /card-types`
+  - `kaiten_custom_properties` - `GET /company/custom-properties`; values are set on cards via
+    `kaiten_update_card`'s legacy `data` with `{"properties": {"id_<propertyId>": value}}`
+- **`kaiten_current_user`** - `GET /users/current`, exposing the SDK's pre-existing
+  `getCurrentUser()`.
+- **`kaiten_attach_file`** (`cardId`, `filePath`, `fileName?`) - reads a local file and uploads
+  it to a card via `PUT /cards/{card_id}/files` as `multipart/form-data` (part name `file`).
+  Backed by a new `KaitenClient.putForm()` that lets `fetch` set the multipart boundary itself
+  (no manual `Content-Type`).
+- **`typeId` on `kaiten_create_card`** - optional card type id (`type_id` in the request body),
+  discoverable via `kaiten_card_types`.
+
+### Changed
+
+- Tool registry grew from 45 to 58 tools. The 45 from 3.1.0 keep their exact order; the 13 new
+  tools (`kaiten_current_user`, `kaiten_tags`, `kaiten_card_types`, `kaiten_custom_properties`,
+  `kaiten_get_time_logs`, `kaiten_add_time_log`, `kaiten_get_blockers`, `kaiten_block_card`,
+  `kaiten_unblock_card`, `kaiten_get_external_links`, `kaiten_add_external_link`,
+  `kaiten_remove_external_link`, `kaiten_attach_file`) are appended at the end of the registry,
+  never interleaved with the existing sequence.
+
 ## 3.1.0 — 2026-07-20
 
 AI-agent ergonomics pass on the MCP tool API. No breaking changes — the 39 tools from 3.0.0

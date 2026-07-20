@@ -49,6 +49,7 @@ export const cardTools: ToolDef[] = [
       size: z.number().optional().describe('Card size/estimate (optional)'),
       plannedStart: z.string().optional().describe('Planned start date, YYYY-MM-DD (optional)'),
       plannedEnd: z.string().optional().describe('Planned end date, YYYY-MM-DD (optional)'),
+      typeId: z.number().optional().describe('Card type ID (optional). Discover available types via kaiten_card_types.'),
     },
     handler: async (sdk, args) =>
       sdk.createCard({
@@ -61,6 +62,7 @@ export const cardTools: ToolDef[] = [
         size: args.size,
         plannedStart: args.plannedStart,
         plannedEnd: args.plannedEnd,
+        typeId: args.typeId,
       }),
   },
   {

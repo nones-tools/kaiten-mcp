@@ -5,7 +5,7 @@ dependencies point inward only:
 
 ```
 ┌────────────────────────────── adapters ─────────────────────────────┐
-│  src/mcp/   tools/ (45 tools by domain) + hooks/ (middleware chain) │
+│  src/mcp/   tools/ (58 tools by domain) + hooks/ (middleware chain) │
 │  src/cli/   commands/ registry + projections + help                 │
 └──────────────────────────────┬──────────────────────────────────────┘
                                │ calls only the facade

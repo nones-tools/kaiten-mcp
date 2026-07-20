@@ -52,8 +52,9 @@ That's it — ask your assistant to list your Kaiten spaces to verify the connec
 
 Every tool backed by an HTTP DELETE to the Kaiten API — `kaiten_delete_card`,
 `kaiten_delete_checklist`, `kaiten_delete_checklist_item`, `kaiten_delete_comment`,
-`kaiten_remove_tag`, `kaiten_detach_from_parent` — is **disabled by default**. Calling one
-returns an actionable error instead of deleting anything.
+`kaiten_remove_tag`, `kaiten_detach_from_parent`, `kaiten_unblock_card`,
+`kaiten_remove_external_link` — is **disabled by default**. Calling one returns an actionable
+error instead of deleting anything.
 
 Deleting Kaiten entities is irreversible. To enable DELETE tools, a human must add
 `KAITEN_API_DELETE_ALLOW=true` to the server's environment on purpose — for example in the
@@ -84,7 +85,7 @@ Or in `~/.kaiten/config` / `./.kaiten.env` / `./.env` (see [Configuration](docs/
 ## Documentation
 
 - [Configuration](docs/configuration.md) — all variables, config files, precedence, allowlists
-- [MCP tools](docs/tools.md) — all 45 tools and their token-saving flags
+- [MCP tools](docs/tools.md) — all 58 tools and their token-saving flags
 - [CLI](docs/cli.md) — the `kaiten` command reference
 - [SDK](docs/sdk.md) — programmatic usage from Node/Bun
 - [Architecture](docs/architecture.md) — layers, Kaiten Core, design decisions

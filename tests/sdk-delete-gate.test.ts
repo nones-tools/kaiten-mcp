@@ -46,6 +46,12 @@ describe('KaitenSDK - DELETE gate integration', () => {
     await expect(sdk.deleteComment(3)).rejects.toBeInstanceOf(KaitenDeleteDisabledError);
   });
 
+  it('3.2.0: unblockCard/removeExternalLink reject the same way (no GET precedes their DELETE)', async () => {
+    const sdk = new KaitenSDK({ apiUrl: 'https://api.example.com', apiToken: 'token', deleteAllow: false });
+    await expect(sdk.unblockCard(1, 2)).rejects.toBeInstanceOf(KaitenDeleteDisabledError);
+    await expect(sdk.removeExternalLink(1, 2)).rejects.toBeInstanceOf(KaitenDeleteDisabledError);
+  });
+
   it('detachFromParent rejects the same way (its GET-then-DELETE flow is stubbed, no real network)', async () => {
     // detachFromParent GETs the parent card before deleting the link - stub
     // that GET so this test never hits the network even though the SDK

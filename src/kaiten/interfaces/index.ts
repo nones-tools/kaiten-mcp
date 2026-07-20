@@ -1,6 +1,10 @@
 export type { Board, Column, Lane, Space } from './board.js';
+export type { CardBlocker } from './blocker.js';
 export type { Card, CardFile, Checklist, ChecklistItem, Tag } from './card.js';
+export type { CardType, CustomProperty } from './company.js';
 export type { Comment } from './comment.js';
 export type { KaitenConfig } from './config.js';
 export type { HttpTransport } from './http.js';
+export type { ExternalLink } from './link.js';
+export type { TimeLog } from './timelog.js';
 export type { User } from './user.js';

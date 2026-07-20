@@ -187,4 +187,45 @@ describe('KaitenClient', () => {
       expect((err as KaitenApiError).body).toBe('forbidden');
     }
   });
+
+  it('putForm sends PUT with the FormData body and no Content-Type header', async () => {
+    let capturedInit: RequestInit | undefined;
+    let capturedUrl = '';
+    const fetchImpl = (async (input: string | URL | Request, init?: RequestInit) => {
+      capturedUrl = String(input);
+      capturedInit = init;
+      return new Response(JSON.stringify({ id: 1 }), { status: 200 });
+    }) as unknown as typeof fetch;
+    const client = makeClient(fetchImpl);
+    const form = new FormData();
+    form.append('file', new Blob(['x']), 'a.txt');
+    const result = await client.putForm('/cards/1/files', form);
+    expect(capturedUrl).toBe('https://api.example.com/cards/1/files');
+    expect(capturedInit?.method).toBe('PUT');
+    expect(capturedInit?.body).toBe(form);
+    const headers = capturedInit?.headers as Record<string, string>;
+    expect(headers['Content-Type']).toBeUndefined();
+    expect(headers.Authorization).toBe('Bearer test-token');
+    expect(result).toEqual({ id: 1 });
+  });
+
+  it('putForm returns undefined for a 204 response', async () => {
+    const fetchImpl = (async () => new Response(null, { status: 204 })) as unknown as typeof fetch;
+    const client = makeClient(fetchImpl);
+    const result = await client.putForm('/cards/1/files', new FormData());
+    expect(result).toBeUndefined();
+  });
+
+  it('putForm throws KaitenApiError on a non-2xx response', async () => {
+    const fetchImpl = (async () => new Response(JSON.stringify({ error: 'too large' }), { status: 413 })) as unknown as typeof fetch;
+    const client = makeClient(fetchImpl);
+    try {
+      await client.putForm('/cards/1/files', new FormData());
+      throw new Error('expected putForm to throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(KaitenApiError);
+      expect((err as KaitenApiError).status).toBe(413);
+      expect((err as KaitenApiError).body).toEqual({ error: 'too large' });
+    }
+  });
 });
