@@ -15,7 +15,13 @@ bun run dev          # MCP server, watch mode
 bun run dev:cli      # CLI from sources
 bun run build        # bundle to dist/ (Node target) + emit .d.ts
 bun run pack         # build + npm tarball (bun pm pack)
+bun run release patch|minor|major|X.Y.Z  # version bump + `chore: X.Y.Z` commit + push → CI publishes
 ```
+
+Releases are CI-driven: only a `chore: X.Y.Z` commit on master triggers
+`.github/workflows/release.yml` (lint/test/build → npm publish → GitHub Packages mirror
+→ tag + GitHub Release). Regular commits never run CI. Keep upcoming changes under
+`## Unreleased` in CHANGELOG.md — the release flow rolls it into the version section.
 
 ## Map
 

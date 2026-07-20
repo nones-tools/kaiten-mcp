@@ -27,14 +27,29 @@ printf '%s\n%s\n%s\n' \
 - Feature process: **Spec Kit** (`/speckit-specify` → `/speckit-plan` → `/speckit-tasks`
   → `/speckit-implement`); artifacts in `specs/`, principles in
   `.specify/memory/constitution.md`.
-- Quality gates before any commit: `bun test` and `bunx tsc --noEmit` green.
+- Quality gates before any commit: `bun run lint`, `bun test` and `bunx tsc --noEmit` green.
 
-## Releasing
+## Releasing (CI/CD)
+
+Releases are fully automated via GitHub Actions (`.github/workflows/release.yml`).
+The workflow triggers **only** on a commit to `master` whose message is exactly
+`chore: X.Y.Z` — regular commits never run CI.
 
 ```bash
-# bump "version" in package.json, then:
-npm publish            # prepublishOnly runs the build; publishConfig.access=public
+bun run release patch      # or: minor | major | 3.4.0; add --no-push to hold the push
 ```
 
-For a private registry: `bun run pack` and push the tarball, or
+The script checks the working tree is clean, runs lint/typecheck/tests locally, bumps
+`package.json`, rolls the CHANGELOG `## Unreleased` section into the new version,
+commits `chore: X.Y.Z` and pushes. CI then re-runs all gates, builds, smoke-tests the
+dist under plain Node, publishes `@nones/kaiten-mcp` to npm and the `@zeizel/kaiten-mcp`
+mirror to GitHub Packages, tags `vX.Y.Z` and creates the GitHub Release with notes taken
+from the CHANGELOG section.
+
+Required repo secret: `NPM_TOKEN` — an npm granular access token with publish rights for
+`@nones/kaiten-mcp` (and "bypass 2FA" enabled). `GITHUB_TOKEN` is provided by Actions
+automatically. Keep changes for the next release under a `## Unreleased` heading in
+`CHANGELOG.md` — the release script and CI notes depend on it.
+
+Manual fallback for a private registry: `bun run pack` and push the tarball, or
 `npm publish --registry=<url>`.

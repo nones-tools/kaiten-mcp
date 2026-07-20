@@ -5,6 +5,19 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+### Added
+
+- CI/CD via GitHub Actions (`.github/workflows/release.yml`): triggered only by a
+  `chore: X.Y.Z` release commit on `master` (regular commits never run CI). Pipeline:
+  Biome lint -> typecheck -> tests -> build -> Node smoke-test -> `npm publish`
+  (`@nones/kaiten-mcp`) -> GitHub Packages mirror (`@zeizel/kaiten-mcp`) -> git tag +
+  GitHub Release with notes from this changelog.
+- `bun run release patch|minor|major|X.Y.Z` script: local gates, version bump,
+  changelog roll, `chore: X.Y.Z` commit and push.
+- Biome linter (`bun run lint`), zero diagnostics across src/tests/scripts.
+
 ## 3.2.1 — 2026-07-20
 
 ### Added

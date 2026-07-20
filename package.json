@@ -33,7 +33,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome lint src tests scripts",
     "pack": "bun run build && bun pm pack",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "bun run build",
+    "release": "bun scripts/release.ts"
   },
   "keywords": [
     "kaiten",
