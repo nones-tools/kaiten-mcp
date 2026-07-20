@@ -1,0 +1,120 @@
+import type { KaitenClient } from '../http/client.js';
+import type { Card, Checklist, ChecklistItem, Tag } from '../interfaces/card.js';
+import type { Column } from '../interfaces/board.js';
+
+export class CardsApi {
+  constructor(private readonly client: KaitenClient) {}
+
+  getCards(spaceId: number, boardId?: number | null): Promise<Card[]> {
+    let url = `/spaces/${spaceId}/cards`;
+    if (boardId) url += `?board_id=${boardId}`;
+    return this.client.get<Card[]>(url);
+  }
+
+  getCard(cardId: number): Promise<Card> {
+    return this.client.get<Card>(`/cards/${cardId}`);
+  }
+
+  createChecklist(cardId: number, name: string): Promise<Checklist> {
+    return this.client.post<Checklist>(`/cards/${cardId}/checklists`, { name });
+  }
+
+  deleteChecklist(cardId: number, checklistId: number): Promise<unknown> {
+    return this.client.delete(`/cards/${cardId}/checklists/${checklistId}`);
+  }
+
+  updateChecklist(cardId: number, checklistId: number, data: Record<string, unknown>): Promise<Checklist> {
+    return this.client.patch<Checklist>(`/cards/${cardId}/checklists/${checklistId}`, data);
+  }
+
+  createCard(data: Record<string, unknown>): Promise<Card> {
+    return this.client.post<Card>('/cards', data);
+  }
+
+  updateCard(cardId: number, data: Record<string, unknown>): Promise<Card> {
+    return this.client.patch<Card>(`/cards/${cardId}`, data);
+  }
+
+  deleteCard(cardId: number): Promise<unknown> {
+    return this.client.delete(`/cards/${cardId}`);
+  }
+
+  /**
+   * Validates the target column belongs to the card's board before moving,
+   * throwing a helpful error listing the board's available columns if not.
+   */
+  async moveCard(cardId: number, columnId: number, laneId: number | null = null): Promise<Card> {
+    let card: Card;
+    try {
+      card = await this.getCard(cardId);
+    } catch {
+      throw new Error(`Card with ID ${cardId} not found`);
+    }
+
+    let columns: Column[];
+    try {
+      columns = await this.client.get<Column[]>(`/boards/${card.board_id}/columns`);
+    } catch {
+      throw new Error(`Failed to get columns for board ${card.board_id}`);
+    }
+
+    const targetColumn = columns.find((c) => c.id === columnId);
+    if (!targetColumn) {
+      throw new Error(
+        `Column with ID ${columnId} not found on board ${card.board_id}. ` +
+          `Available columns on this board: ${columns.map((c) => `${c.id} (${c.title})`).join(', ')}`
+      );
+    }
+
+    const data: Record<string, unknown> = { column_id: columnId };
+    if (laneId) data.lane_id = laneId;
+    return this.client.patch<Card>(`/cards/${cardId}`, data);
+  }
+
+  assignCard(cardId: number, userId: number): Promise<Card> {
+    return this.client.patch<Card>(`/cards/${cardId}`, { members: [{ id: userId }] });
+  }
+
+  unassignCard(cardId: number, userId: number): Promise<Card> {
+    return this.client.patch<Card>(`/cards/${cardId}`, { members_remove: [userId] });
+  }
+
+  archiveCard(cardId: number): Promise<Card> {
+    return this.client.patch<Card>(`/cards/${cardId}`, { condition: 2 });
+  }
+
+  unarchiveCard(cardId: number): Promise<Card> {
+    return this.client.patch<Card>(`/cards/${cardId}`, { condition: 1 });
+  }
+
+  addTag(cardId: number, tagName: string): Promise<Tag> {
+    return this.client.post<Tag>(`/cards/${cardId}/tags`, { name: tagName });
+  }
+
+  /** Resolves the tag id from the card's own tags before deleting. */
+  async removeTag(cardId: number, tagName: string): Promise<unknown> {
+    const card = await this.getCard(cardId);
+    const tag = card.tags?.find((t) => t.name === tagName);
+    if (!tag) {
+      throw new Error(`Tag "${tagName}" not found on card`);
+    }
+    return this.client.delete(`/cards/${cardId}/tags/${tag.id}`);
+  }
+
+  setTags(cardId: number, tagNames: string[]): Promise<Card> {
+    const tags = tagNames.map((name) => ({ name }));
+    return this.client.patch<Card>(`/cards/${cardId}`, { tags });
+  }
+
+  toggleChecklistItem(checklistId: number, itemId: number, checked: boolean): Promise<ChecklistItem> {
+    return this.client.patch<ChecklistItem>(`/checklists/${checklistId}/items/${itemId}`, { checked });
+  }
+
+  addChecklistItem(checklistId: number, text: string): Promise<ChecklistItem> {
+    return this.client.post<ChecklistItem>(`/checklists/${checklistId}/items`, { text });
+  }
+
+  deleteChecklistItem(checklistId: number, itemId: number): Promise<unknown> {
+    return this.client.delete(`/checklists/${checklistId}/items/${itemId}`);
+  }
+}

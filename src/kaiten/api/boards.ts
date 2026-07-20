@@ -1,0 +1,30 @@
+import type { KaitenClient } from '../http/client.js';
+import type { Board, Column, Space } from '../interfaces/board.js';
+
+export class BoardsApi {
+  constructor(private readonly client: KaitenClient) {}
+
+  getSpaces(): Promise<Space[]> {
+    return this.client.get<Space[]>('/spaces');
+  }
+
+  getSpace(spaceId: number): Promise<Space> {
+    return this.client.get<Space>(`/spaces/${spaceId}`);
+  }
+
+  getColumns(boardId: number): Promise<Column[]> {
+    return this.client.get<Column[]>(`/boards/${boardId}/columns`);
+  }
+
+  getColumn(columnId: number): Promise<Column> {
+    return this.client.get<Column>(`/columns/${columnId}`);
+  }
+
+  getBoard(boardId: number): Promise<Board> {
+    return this.client.get<Board>(`/boards/${boardId}`);
+  }
+
+  getBoards(spaceId: number): Promise<Board[]> {
+    return this.client.get<Board[]>(`/spaces/${spaceId}/boards`);
+  }
+}
