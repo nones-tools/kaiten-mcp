@@ -5,6 +5,10 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## 3.2.3 — 2026-07-20
+
+_No changelog entries — see commit history._
+
 ## 3.2.2 — 2026-07-20
 
 ### Added
