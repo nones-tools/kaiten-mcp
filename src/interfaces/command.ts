@@ -13,5 +13,6 @@ export interface CliDeps {
 export interface CliCommand {
   name: string;
   aliases?: string[];
+  // biome-ignore lint/suspicious/noConfusingVoidType: Promise<void> (not Promise<undefined>) is required for plain `async () => {}` command implementations to type-check.
   run(argv: string[], deps: CliDeps): Promise<number | void>;
 }

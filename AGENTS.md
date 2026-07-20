@@ -10,6 +10,7 @@ for the non-negotiable rules before making structural changes.
 bun install          # deps
 bun test             # full suite — no network/credentials needed; must stay green
 bunx tsc --noEmit    # strict typecheck; must stay clean
+bun run lint         # Biome linter; must stay clean
 bun run dev          # MCP server, watch mode
 bun run dev:cli      # CLI from sources
 bun run build        # bundle to dist/ (Node target) + emit .d.ts

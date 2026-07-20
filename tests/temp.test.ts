@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import fs from 'fs/promises';
+import path from 'path';
 import { cleanTempDir, getCardTempDir } from '@/lib';
 
 // NOTE on KAITEN_TEMP_DIR: src/lib/temp.ts reads process.env.KAITEN_TEMP_DIR

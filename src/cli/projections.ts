@@ -18,7 +18,7 @@ export function optimizeCard(card: Card) {
     tags: card.tags?.map((t) => t.name) || [],
     planned_start: c.planned_start ? c.planned_start.split('T')[0] : null,
     planned_end: c.planned_end ? c.planned_end.split('T')[0] : null,
-    time_spent: c.time_spent_sum ? Math.round((c.time_spent_sum / 60) * 10) / 10 + 'h' : null,
+    time_spent: c.time_spent_sum ? `${Math.round((c.time_spent_sum / 60) * 10) / 10}h` : null,
   };
 }
 
@@ -57,7 +57,7 @@ export function optimizeCardDetails(card: Card) {
       end: c.planned_end ? c.planned_end.split('T')[0] : null,
     },
     time: {
-      spent: c.time_spent_sum ? Math.round((c.time_spent_sum / 60) * 10) / 10 + 'h' : null,
+      spent: c.time_spent_sum ? `${Math.round((c.time_spent_sum / 60) * 10) / 10}h` : null,
       blocked: c.time_blocked_sum || 0,
     },
     dependencies: {

@@ -28,7 +28,7 @@ export const cardTools: ToolDef[] = [
         .optional()
         .describe('Return minimal JSON format (token optimized). Default true. Pass false to get the full card payload.'),
     },
-    handler: async (sdk, args) => sdk.getCard(args.cardId, args.simple === false ? false : true),
+    handler: async (sdk, args) => sdk.getCard(args.cardId, args.simple !== false),
   },
   {
     name: 'kaiten_create_card',

@@ -59,7 +59,7 @@ export const findCommand: CliCommand = {
       if (boardFilter) {
         const boardValue = boardFilter.split('=')[1] as string;
         let boardId: number;
-        if (!isNaN(Number(boardValue))) {
+        if (!Number.isNaN(Number(boardValue))) {
           boardId = parseInt(boardValue, 10);
         } else {
           boardId = await sdk.getBoardId(sdk.config.defaultSpaceId as number, boardValue);

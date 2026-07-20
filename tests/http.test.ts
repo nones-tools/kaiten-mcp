@@ -172,7 +172,8 @@ describe('KaitenClient', () => {
     await client.getBuffer('/cards/1/files/2');
     expect(capturedUrl).toBe('https://api.example.com/cards/1/files/2');
     expect(capturedInit?.method).toBe('GET');
-    expect((capturedInit?.headers as Record<string, string>).Authorization).toBe('Bearer test-token');
+    const headers = capturedInit?.headers as Record<string, string>;
+    expect(headers.Authorization).toBe('Bearer test-token');
   });
 
   it('getBuffer throws KaitenApiError on a non-2xx response', async () => {
