@@ -1,6 +1,6 @@
 {
   "name": "@nones/kaiten-mcp",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "type": "module",
   "description": "MCP server, CLI and typed SDK for the Kaiten API",
   "license": "MIT",
