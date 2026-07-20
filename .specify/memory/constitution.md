@@ -57,8 +57,10 @@ new tools must consider response size a feature requirement, not an afterthought
 - Work items are tracked with **beads** (`bd`): check `bd ready` before starting,
   `bd create` for discovered work, close issues in the same change that resolves them.
 - Runtime is Node >= 18; Bun is the toolchain (build/test/dev). Runtime dependencies are
-  limited to `@modelcontextprotocol/sdk` and `zod` — adding one is an architectural
-  decision that requires updating this constitution.
+  limited to `@modelcontextprotocol/sdk`, `zod`, `inversify` and `reflect-metadata`
+  (the latter two power the DI composition root in `src/di/`; `reflect-metadata` is a
+  hard runtime requirement of `inversify` 8, not optional) — adding another is an
+  architectural decision that requires updating this constitution.
 
 ## Governance
 
@@ -67,4 +69,8 @@ the change that motivates them and must keep `AGENTS.md` and `docs/architecture.
 consistent. Semantic versioning applies to the npm package; breaking any Principle-IV
 contract requires a major version bump.
 
-**Version**: 1.1.0 | **Ratified**: 2026-07-20 | **Last Amended**: 2026-07-20
+**Version**: 1.2.0 | **Ratified**: 2026-07-20 | **Last Amended**: 2026-07-20
+
+**1.2.0 amendment**: added `inversify` + `reflect-metadata` as frozen runtime
+dependencies for the `src/di/` composition root (NestJS/Angular-style DI). `src/kaiten/`
+remains undecorated and framework-free — Core classes are bound via factory bindings.

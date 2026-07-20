@@ -1,10 +1,13 @@
-import type { Checklist, ChecklistItem, KaitenApi } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { Checklist, ChecklistItem, KaitenApiPort } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 
+@injectable()
 export class ChecklistService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard
   ) {}
 
   async getChecklists(cardId: number): Promise<Checklist[]> {

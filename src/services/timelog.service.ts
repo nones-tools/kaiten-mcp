@@ -1,10 +1,13 @@
-import type { KaitenApi, TimeLog } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { KaitenApiPort, TimeLog } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 
+@injectable()
 export class TimeLogService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard
   ) {}
 
   async getTimeLogs(cardId: number): Promise<TimeLog[]> {

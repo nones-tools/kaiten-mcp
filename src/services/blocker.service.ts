@@ -1,10 +1,13 @@
-import type { CardBlocker, KaitenApi } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { CardBlocker, KaitenApiPort } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 
+@injectable()
 export class BlockerService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard
   ) {}
 
   async getBlockers(cardId: number): Promise<CardBlocker[]> {

@@ -1,4 +1,6 @@
-import type { Card, KaitenApi } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { Card, KaitenApiPort } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { CardService } from './card.service';
 import type { AccessGuard } from './guard';
 import { type MinimalParent, type MinimalSubtask, toMinimalParent, toMinimalSubtask } from './projections';
@@ -10,11 +12,12 @@ export interface TaskFlowTask {
   [key: string]: unknown;
 }
 
+@injectable()
 export class HierarchyService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard,
-    private readonly cards: CardService
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard,
+    @inject(TOKENS.CardService) private readonly cards: CardService
   ) {}
 
   async createSubtask(parentId: number, title: string, position = 0): Promise<Card> {

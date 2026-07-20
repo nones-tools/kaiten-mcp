@@ -1,4 +1,4 @@
-import type { HttpTransport } from '../interfaces';
+import type { HttpTransport, KaitenApiPort } from '../interfaces';
 import { BlockersApi } from './blockers';
 import { BoardsApi } from './boards';
 import { CardsApi } from './cards';
@@ -21,7 +21,7 @@ export { SubtasksApi } from './subtasks';
 export { TimeLogsApi } from './timelogs';
 export { UsersApi } from './users';
 
-export class KaitenApi {
+export class KaitenApi implements KaitenApiPort {
   readonly cards: CardsApi;
   readonly boards: BoardsApi;
   readonly comments: CommentsApi;

@@ -1,13 +1,16 @@
-import type { Card, KaitenApi } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { Card, KaitenApiPort } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { CardService } from './card.service';
 import type { AccessGuard } from './guard';
 import { type TaggedCard, toTaggedCard } from './projections';
 
+@injectable()
 export class TagService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard,
-    private readonly cards: CardService
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard,
+    @inject(TOKENS.CardService) private readonly cards: CardService
   ) {}
 
   async addTag(cardId: number, tagName: string): Promise<TaggedCard> {

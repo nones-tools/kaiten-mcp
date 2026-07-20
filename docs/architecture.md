@@ -39,6 +39,26 @@ dependencies point inward only:
 - **Command registry** — CLI commands are self-contained objects dispatched by name;
   adding a command touches one file plus the registry.
 
+## Dependency injection
+
+`src/di/` is the composition root, NestJS/Angular-style, built on `inversify`:
+
+- **`tokens.ts`** — a typed `TOKENS` object of `Symbol`s (`TOKENS.CardService`,
+  `TOKENS.KaitenApi`, `TOKENS.KaitenSDK`, …), one per bound dependency.
+- **`container.ts`** — `buildContainer(overrides?)` wires everything into a fresh
+  `Container` in singleton scope. `overrides` mirrors `KaitenSDKOptions`: config
+  overrides plus an optional injected `client` (how tests avoid the network).
+- **Core stays framework-free** — `KaitenClient`/`KaitenApi` are bound with factory
+  bindings (`toDynamicValue`); nothing under `src/kaiten/` imports `inversify` or
+  carries a decorator, preserving Principle III (future `@nones/kaiten-core` extraction).
+- **App-layer services are decorated** — every class in `src/services/` is
+  `@injectable()` with constructor params resolved via `@inject(TOKENS.X)`, and is
+  typed against `KaitenApiPort`/`HttpTransport` (see `src/kaiten/interfaces/ports.ts`),
+  never the concrete `KaitenApi`/`KaitenClient` classes.
+- **`KaitenSDK` is unaffected from the outside** — its constructor still takes
+  `KaitenSDKOptions` and builds a container internally, so `new KaitenSDK(options)` /
+  `createSDK(options)` keep their exact pre-DI signature and behavior.
+
 ## Rules that keep it maintainable (see constitution)
 
 - No source file over **200 lines**; one domain concept per file; layers expose barrels.

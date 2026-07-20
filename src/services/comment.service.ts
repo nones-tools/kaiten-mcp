@@ -1,10 +1,13 @@
-import type { Comment, KaitenApi } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { Comment, KaitenApiPort } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 
+@injectable()
 export class CommentService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard
   ) {}
 
   async addComment(cardId: number, text: string, parentId: number | null = null): Promise<Comment> {

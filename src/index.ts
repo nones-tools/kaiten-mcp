@@ -4,3 +4,5 @@
 export * from './kaiten';
 export { createSDK, KaitenSDK } from './sdk';
 export type { KaitenSDKOptions } from './sdk';
+export { buildContainer, TOKENS } from './di';
+export type { ContainerOverrides } from './di';

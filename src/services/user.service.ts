@@ -1,7 +1,10 @@
-import type { KaitenApi, User } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { KaitenApiPort, User } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 
+@injectable()
 export class UserService {
-  constructor(private readonly api: KaitenApi) {}
+  constructor(@inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort) {}
 
   async findUser(query: string): Promise<User> {
     const users = await this.api.users.searchUsers(query);

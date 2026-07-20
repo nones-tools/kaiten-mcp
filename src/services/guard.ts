@@ -1,14 +1,17 @@
-import type { KaitenApi, KaitenConfig } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { KaitenApiPort, KaitenConfig } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 
 /**
  * Enforces the KAITEN_ALLOWED_SPACE_IDS / KAITEN_ALLOWED_BOARD_IDS
  * allowlists. Semantics moved verbatim from the pre-refactor KaitenSDK
  * private methods.
  */
+@injectable()
 export class AccessGuard {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly config: Pick<KaitenConfig, 'allowedSpaceIds' | 'allowedBoardIds'>
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.Config) private readonly config: Pick<KaitenConfig, 'allowedSpaceIds' | 'allowedBoardIds'>
   ) {}
 
   validateSpaceId(spaceId: number | null | undefined): true {

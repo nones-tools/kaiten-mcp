@@ -1,8 +1,11 @@
-import type { KaitenApi } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { KaitenApiPort } from '../kaiten';
 import * as gitApi from '../lib';
+import { TOKENS } from '../di/tokens';
 
+@injectable()
 export class GitService {
-  constructor(private readonly api: KaitenApi) {}
+  constructor(@inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort) {}
 
   getCurrentBranch(): Promise<string> {
     return gitApi.getCurrentBranch();

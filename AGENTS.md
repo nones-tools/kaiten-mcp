@@ -21,8 +21,9 @@ bun run pack         # build + npm tarball (bun pm pack)
 | Path | What lives there | Rule |
 | --- | --- | --- |
 | `src/kaiten/` | **Kaiten Core**: `interfaces/` (entity types), `http/` (fetch client + errors), `api/` (resource classes), `config.ts` | Self-contained: never import from outside `src/kaiten/`. Future standalone package `@nones/kaiten-core` (beads epic `kaiten-mcp-jtg`) |
-| `src/services/` | Business logic: `AccessGuard` (space/board allowlists), projections, domain services | Depends only on the core |
-| `src/sdk.ts` | `KaitenSDK` facade — public API of the package | Adapters call this, never raw HTTP |
+| `src/services/` | Business logic: `AccessGuard` (space/board allowlists), projections, domain services | Depends only on the core; every class is `@injectable()`, constructor deps via `@inject(TOKENS.X)`, typed against `KaitenApiPort`/`HttpTransport`, never the concrete core classes |
+| `src/di/` | Composition root: `tokens.ts` (typed `TOKENS` symbols), `container.ts` (`buildContainer()`, NestJS/Angular-style), barrel | Core classes bound via factory (`toDynamicValue`); app services bound `.to(Class)` |
+| `src/sdk.ts` | `KaitenSDK` facade — public API of the package | Adapters call this, never raw HTTP; builds/reads a DI container internally, public constructor signature unchanged |
 | `src/interfaces/` | App contracts: `ToolDef`, `CliCommand`, `ToolHook` | Types only |
 | `src/mcp/` | MCP adapter: `tools/` by domain, `hooks/` middleware chain, `server.ts` entry | Tool names/schemas are frozen contracts |
 | `src/cli/` | CLI adapter: `commands/`, `projections.ts`, `help.ts`, `index.ts` entry | Output format is a frozen contract |
@@ -40,7 +41,8 @@ bun run pack         # build + npm tarball (bun pm pack)
   need a major version bump. New tools and new optional params are additive and allowed in
   a minor version (see `.specify/memory/constitution.md` Principle IV, amended 1.1.0).
 - **Tests gate every change**: `bun test` + `bunx tsc --noEmit` green before done.
-- Runtime deps are frozen to `@modelcontextprotocol/sdk` + `zod` (constitution).
+- Runtime deps are frozen to `@modelcontextprotocol/sdk` + `zod` + `inversify` +
+  `reflect-metadata` (constitution, amended 1.2.0).
 - Non-interactive shell flags only (`rm -f`, `cp -f`, `mv -f`, …) — some systems alias
   these to `-i` and an agent will hang on the prompt.
 

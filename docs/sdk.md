@@ -59,3 +59,24 @@ const spaces = await api.boards.getSpaces();
 `KaitenClient` accepts an injectable `fetchImpl` — that is how the test suite runs
 without a network. All Kaiten entity types (`Card`, `Board`, `Column`, `User`,
 `Checklist`, …) are exported from the package root.
+
+## Dependency injection container
+
+`createSDK()`/`new KaitenSDK()` already build a DI container internally - most callers
+never need to touch it directly. For advanced cases (resolving a single service, or
+wiring the same container into other code), the composition root is also exported:
+
+```ts
+import { buildContainer, TOKENS } from '@nones/kaiten-mcp';
+
+const container = buildContainer({ apiUrl: '...', apiToken: '...' });
+const sdk = container.get(TOKENS.KaitenSDK);       // same object every call (singleton)
+const cardService = container.get(TOKENS.CardService); // resolve one service directly
+
+// Tests: inject a fake transport, same override shape as KaitenSDKOptions.
+const testContainer = buildContainer({ apiUrl: 'https://api.example.com', apiToken: 'token', client: fakeClient });
+```
+
+`TOKENS` also exposes `TOKENS.KaitenApi`, typed as `KaitenApiPort` (see
+`KaitenApiPort`/`CardsApiPort`/etc. exported from the package root) - the interface
+`src/services/*` depend on instead of the concrete `KaitenApi` class.

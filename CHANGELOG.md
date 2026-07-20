@@ -5,6 +5,27 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+### Added
+
+- **Dependency injection composition root** (`src/di/`), NestJS/Angular-style, built on
+  `inversify`. `TOKENS` (typed `Symbol`s) and `buildContainer(overrides?)` are now
+  exported from the package root, alongside `KaitenApiPort` and the per-resource port
+  types (`CardsApiPort`, `BoardsApiPort`, …) from `src/kaiten/interfaces/ports.ts`.
+- Every class in `src/services/` is now `@injectable()` with constructor dependencies
+  resolved via `@inject(TOKENS.X)`, and depends on `KaitenApiPort`/`HttpTransport`
+  instead of the concrete `KaitenApi`/`KaitenClient` classes. `KaitenApi implements
+  KaitenApiPort`.
+- New runtime dependencies: `inversify` and `reflect-metadata` (constitution amended to
+  1.2.0). `src/kaiten/` (Kaiten Core) stays undecorated and framework-free — nothing
+  under it imports `inversify`; `KaitenClient`/`KaitenApi` are bound in the container via
+  factory bindings (`toDynamicValue`).
+
+No breaking changes: `new KaitenSDK(options)` / `createSDK(options)` keep their exact
+pre-DI constructor signature and behavior (they build a container internally), and every
+existing root export is unchanged.
+
 ## 3.2.0 — 2026-07-20
 
 New Kaiten API coverage, researched against the official docs (https://developers.kaiten.ru/).

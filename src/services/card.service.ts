@@ -1,4 +1,6 @@
-import type { Card, KaitenApi, KaitenConfig } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { Card, KaitenApiPort, KaitenConfig } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 import { type MinimalCard, toMinimalCard } from './projections';
 
@@ -16,11 +18,12 @@ export interface CreateCardInput {
   typeId?: number;
 }
 
+@injectable()
 export class CardService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard,
-    private readonly config: Pick<KaitenConfig, 'defaultSpaceId'>
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard,
+    @inject(TOKENS.Config) private readonly config: Pick<KaitenConfig, 'defaultSpaceId'>
   ) {}
 
   async getCards(spaceId: number | null = null, boardId: number | null = null, minimal = false): Promise<Card[] | MinimalCard[]> {

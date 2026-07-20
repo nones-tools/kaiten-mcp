@@ -1,11 +1,14 @@
-import type { Board, Column, KaitenApi, KaitenConfig, Lane, Space } from '../kaiten';
+import { inject, injectable } from 'inversify';
+import type { Board, Column, KaitenApiPort, KaitenConfig, Lane, Space } from '../kaiten';
+import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 
+@injectable()
 export class BoardService {
   constructor(
-    private readonly api: KaitenApi,
-    private readonly guard: AccessGuard,
-    private readonly config: Pick<KaitenConfig, 'defaultSpaceId' | 'allowedSpaceIds'>
+    @inject(TOKENS.KaitenApi) private readonly api: KaitenApiPort,
+    @inject(TOKENS.AccessGuard) private readonly guard: AccessGuard,
+    @inject(TOKENS.Config) private readonly config: Pick<KaitenConfig, 'defaultSpaceId' | 'allowedSpaceIds'>
   ) {}
 
   async getSpaces(): Promise<Space[]> {

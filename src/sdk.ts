@@ -1,15 +1,15 @@
-import {
-  KaitenApi, KaitenClient, loadConfig,
-  type Board, type Card, type CardBlocker, type CardFile, type CardType,
-  type Checklist, type ChecklistItem, type Column, type Comment, type CustomProperty,
-  type ExternalLink, type KaitenConfig, type Lane, type Space, type Tag, type TimeLog, type User,
+import type {
+  Board, Card, CardBlocker, CardFile, CardType,
+  Checklist, ChecklistItem, Column, Comment, CustomProperty,
+  ExternalLink, KaitenApi, KaitenClient, KaitenConfig, Lane, Space, Tag, TimeLog, User,
 } from './kaiten';
-import {
-  AccessGuard, BlockerService, BoardService, CardService, ChecklistService, CommentService,
+import { buildContainer } from './di/container';
+import { TOKENS } from './di/tokens';
+import type {
+  BlockerService, BoardService, CardService, ChecklistService, CommentService,
   DictionaryService, FileService, GitService, HierarchyService, LinkService, TagService,
   TimeLogService, UserService,
-  type CreateCardInput, type MinimalCard, type MinimalParent, type MinimalSubtask,
-  type TaggedCard, type TaskFlowTask,
+  CreateCardInput, MinimalCard, MinimalParent, MinimalSubtask, TaggedCard, TaskFlowTask,
 } from './services';
 
 export type { CreateCardInput, MinimalCard, MinimalParent, MinimalSubtask, TaggedCard, TaskFlowTask } from './services';
@@ -21,9 +21,18 @@ export interface KaitenSDKOptions extends Partial<KaitenConfig> {
 /**
  * Facade over the Kaiten Core plus the business-logic services in
  * src/services/ (allowlist guard, minimal projections, domain services,
- * git/temp helpers). Constructs core client/api + AccessGuard + services;
- * every public method is a one-line delegation. This is the package's
- * public API - adapters (MCP, CLI) call this and never raw HTTP.
+ * git/temp helpers). Every public method is a one-line delegation. This is
+ * the package's public API - adapters (MCP, CLI) call this and never raw
+ * HTTP.
+ *
+ * Internally builds a fresh DI container (see src/di/) per instance and
+ * pulls every dependency from it via `TOKENS` - `buildContainer` is also
+ * where `KaitenClient`/`KaitenApi` get constructed (factory bindings) and
+ * every service is wired with its `@injectable`/`@inject` metadata. The
+ * public constructor signature - `Partial<KaitenConfig>` overrides plus an
+ * optional injected `client` - is unchanged from the pre-DI implementation,
+ * so existing call sites (`new KaitenSDK(options)`, `createSDK(options)`)
+ * and tests keep working without modification.
  */
 export class KaitenSDK {
   readonly config: KaitenConfig;
@@ -45,27 +54,29 @@ export class KaitenSDK {
   private readonly dictionaries: DictionaryService;
 
   constructor(options: KaitenSDKOptions = {}) {
-    const { client, ...configOverrides } = options;
-    this.config = loadConfig(configOverrides);
-    this.client =
-      client ??
-      new KaitenClient({ apiUrl: this.config.apiUrl, apiToken: this.config.apiToken, allowDelete: this.config.deleteAllow });
-    this.api = new KaitenApi(this.client);
+    const container = buildContainer(options);
+    this.config = container.get(TOKENS.Config);
+    // The container only ever constructs a `KaitenClient`/`KaitenApi` (see
+    // src/di/container.ts) or returns the caller's injected `client`, whose
+    // declared type on `KaitenSDKOptions` is already `KaitenClient` - so
+    // both casts below just recover the concrete type from the token's
+    // wider port type (`HttpTransport`/`KaitenApiPort`).
+    this.client = container.get(TOKENS.HttpTransport) as KaitenClient;
+    this.api = container.get(TOKENS.KaitenApi) as KaitenApi;
 
-    const guard = new AccessGuard(this.api, this.config);
-    this.cards = new CardService(this.api, guard, this.config);
-    this.tags = new TagService(this.api, guard, this.cards);
-    this.hierarchy = new HierarchyService(this.api, guard, this.cards);
-    this.comments = new CommentService(this.api, guard);
-    this.boards = new BoardService(this.api, guard, this.config);
-    this.users = new UserService(this.api);
-    this.git = new GitService(this.api);
-    this.files = new FileService(this.api, guard);
-    this.checklists = new ChecklistService(this.api, guard);
-    this.timeLogs = new TimeLogService(this.api, guard);
-    this.blockers = new BlockerService(this.api, guard);
-    this.links = new LinkService(this.api, guard);
-    this.dictionaries = new DictionaryService(this.api);
+    this.cards = container.get(TOKENS.CardService);
+    this.tags = container.get(TOKENS.TagService);
+    this.hierarchy = container.get(TOKENS.HierarchyService);
+    this.comments = container.get(TOKENS.CommentService);
+    this.boards = container.get(TOKENS.BoardService);
+    this.users = container.get(TOKENS.UserService);
+    this.git = container.get(TOKENS.GitService);
+    this.files = container.get(TOKENS.FileService);
+    this.checklists = container.get(TOKENS.ChecklistService);
+    this.timeLogs = container.get(TOKENS.TimeLogService);
+    this.blockers = container.get(TOKENS.BlockerService);
+    this.links = container.get(TOKENS.LinkService);
+    this.dictionaries = container.get(TOKENS.DictionaryService);
   }
 
   // Cards
