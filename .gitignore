@@ -33,3 +33,6 @@ Thumbs.db
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# npm auth (локальный токен, не коммитить)
+.npmrc
