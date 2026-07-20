@@ -14,6 +14,7 @@ export const commentTools: ToolDef[] = [
   {
     name: 'kaiten_get_comments',
     description: 'Get comments for card',
+    annotations: { readOnlyHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
     },
@@ -34,10 +35,36 @@ export const tagTools: ToolDef[] = [
   {
     name: 'kaiten_remove_tag',
     description: 'Remove tag from card',
+    annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
       tagName: z.string().describe('Tag name'),
     },
     handler: async (sdk, args) => sdk.removeTag(args.cardId, args.tagName),
+  },
+];
+
+/**
+ * 3.1.0 additive comment tools - appended after the legacy `commentTools` /
+ * `tagTools` sequences in tools/index.ts.
+ */
+export const newCommentTools: ToolDef[] = [
+  {
+    name: 'kaiten_update_comment',
+    description: 'Update the text of an existing comment',
+    inputSchema: {
+      commentId: z.number().describe('Comment ID'),
+      text: z.string().describe('New comment text'),
+    },
+    handler: async (sdk, args) => sdk.updateComment(args.commentId, args.text),
+  },
+  {
+    name: 'kaiten_delete_comment',
+    description: 'Delete a comment',
+    annotations: { destructiveHint: true },
+    inputSchema: {
+      commentId: z.number().describe('Comment ID'),
+    },
+    handler: async (sdk, args) => sdk.deleteComment(args.commentId),
   },
 ];

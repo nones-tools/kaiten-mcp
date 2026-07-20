@@ -8,7 +8,7 @@
 project-management platform popular in the Russian market). It ships three surfaces
 over one core:
 
-1. **MCP server** (`kaiten-mcp` bin) — 39 tools over stdio for Claude Code, Claude
+1. **MCP server** (`kaiten-mcp` bin) — 45 tools over stdio for Claude Code, Claude
    Desktop, Cursor and any MCP client. This is the primary product.
 2. **CLI** (`kaiten` bin) — human/scriptable access to the same operations.
 3. **Typed SDK** (package root import) — programmatic access for Node/Bun code.

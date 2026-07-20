@@ -1,7 +1,7 @@
 import { KaitenApi } from './kaiten/api/index.js';
 import { loadConfig, type KaitenConfig } from './kaiten/config.js';
 import { KaitenClient } from './kaiten/http/client.js';
-import type { Board, Card, CardFile, Checklist, ChecklistItem, Column, Comment, Space, User } from './kaiten/interfaces/index.js';
+import type { Board, Card, CardFile, Checklist, ChecklistItem, Column, Comment, Lane, Space, User } from './kaiten/interfaces/index.js';
 import { BoardService } from './services/board.service.js';
 import { CardService, type CreateCardInput } from './services/card.service.js';
 import { ChecklistService } from './services/checklist.service.js';
@@ -105,6 +105,7 @@ export class KaitenSDK {
   getColumnId(boardId: number, columnTitle: string): Promise<number> { return this.boards.getColumnId(boardId, columnTitle); }
   getBoards(spaceId: number | null = null): Promise<Board[]> { return this.boards.getBoards(spaceId); }
   getColumns(boardId: number): Promise<Column[]> { return this.boards.getColumns(boardId); }
+  getLanes(boardId: number): Promise<Lane[]> { return this.boards.getLanes(boardId); }
 
   // Users
   findUser(query: string): Promise<User> { return this.users.findUser(query); }

@@ -30,6 +30,7 @@ export const gitTools: ToolDef[] = [
   {
     name: 'kaiten_git_status',
     description: 'Get git status',
+    annotations: { readOnlyHint: true },
     inputSchema: {},
     handler: async (sdk) => sdk.getGitStatus(),
   },

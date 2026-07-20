@@ -51,7 +51,7 @@ That's it — ask your assistant to list your Kaiten spaces to verify the connec
 ## Documentation
 
 - [Configuration](docs/configuration.md) — all variables, config files, precedence, allowlists
-- [MCP tools](docs/tools.md) — all 39 tools and their token-saving flags
+- [MCP tools](docs/tools.md) — all 45 tools and their token-saving flags
 - [CLI](docs/cli.md) — the `kaiten` command reference
 - [SDK](docs/sdk.md) — programmatic usage from Node/Bun
 - [Architecture](docs/architecture.md) — layers, Kaiten Core, design decisions

@@ -1,11 +1,15 @@
 import type { HttpTransport } from '../interfaces/http.js';
-import type { Board, Column, Space } from '../interfaces/board.js';
+import type { Board, Column, Lane, Space } from '../interfaces/board.js';
 
 export class BoardsApi {
   constructor(private readonly client: HttpTransport) {}
 
   getSpaces(): Promise<Space[]> {
     return this.client.get<Space[]>('/spaces');
+  }
+
+  getLanes(boardId: number): Promise<Lane[]> {
+    return this.client.get<Lane[]>(`/boards/${boardId}/lanes`);
   }
 
   getSpace(spaceId: number): Promise<Space> {

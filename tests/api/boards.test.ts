@@ -24,4 +24,12 @@ describe('BoardsApi', () => {
     await api.getColumns(3);
     expect(calls[0]!.url).toBe('https://api.example.com/boards/3/columns');
   });
+
+  it('getLanes GETs /boards/{id}/lanes', async () => {
+    const { fetchImpl, calls } = createFakeFetch([{ body: [{ id: 1, title: 'Lane', board_id: 3 }] }]);
+    const api = new BoardsApi(makeClient(fetchImpl));
+    const lanes = await api.getLanes(3);
+    expect(calls[0]!.url).toBe('https://api.example.com/boards/3/lanes');
+    expect(lanes).toEqual([{ id: 1, title: 'Lane', board_id: 3 }]);
+  });
 });

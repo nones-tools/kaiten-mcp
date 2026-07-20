@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import type { ToolContext } from '../interfaces/hook.js';
@@ -8,8 +11,21 @@ import { compose, errorHook, loggingHook } from './hooks/index.js';
 import { errorLog, logLevel } from './logger.js';
 import { tools } from './tools/index.js';
 
+/**
+ * Version comes from package.json at runtime (not a hardcoded literal) so
+ * it can never drift from the published npm version. Read via `fs` rather
+ * than a JSON import: this file runs both as TS source under `bun` (dev
+ * mode, `src/mcp/server.ts`) and as bundled JS under plain Node (`dist/mcp/
+ * server.js`) - a plain `import ... with { type: 'json' }` would tie
+ * correctness to the target Node version's import-attribute support, while
+ * `../../package.json` relative to this file resolves to the repo/package
+ * root in both layouts (src/mcp/ and dist/mcp/ are the same depth).
+ */
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, '../../package.json'), 'utf-8')) as { version: string };
+
 const SERVER_NAME = 'kaiten-mcp';
-const SERVER_VERSION = '3.0.0';
+const SERVER_VERSION = pkg.version;
 
 console.error(`MCP Server starting with log level: ${logLevel}`);
 
@@ -41,6 +57,7 @@ for (const tool of tools) {
     {
       description: tool.description,
       inputSchema: tool.inputSchema,
+      ...(tool.annotations ? { annotations: tool.annotations } : {}),
     },
     async (args: any) => {
       const ctx: ToolContext = { toolName: tool.name, args };

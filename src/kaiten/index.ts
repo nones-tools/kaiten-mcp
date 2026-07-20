@@ -21,6 +21,7 @@ export type {
   Comment,
   HttpTransport,
   KaitenConfig,
+  Lane,
   Space,
   Tag,
   User,

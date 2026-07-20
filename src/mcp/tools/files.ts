@@ -5,6 +5,7 @@ export const fileTools: ToolDef[] = [
   {
     name: 'kaiten_get_files',
     description: 'Get list of files attached to a card',
+    annotations: { readOnlyHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
     },
@@ -32,6 +33,7 @@ export const fileTools: ToolDef[] = [
   {
     name: 'kaiten_clean_temp',
     description: 'Clean temporary directory for Kaiten files',
+    annotations: { destructiveHint: true },
     inputSchema: {
       dir: z
         .string()

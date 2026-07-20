@@ -19,3 +19,12 @@ export interface Column {
   title: string;
   [key: string]: unknown;
 }
+
+export interface Lane {
+  id: number;
+  title: string;
+  board_id: number;
+  condition?: number;
+  sort_order?: number;
+  [key: string]: unknown;
+}

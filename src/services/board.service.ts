@@ -1,5 +1,5 @@
 import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Board, Column, Space } from '../kaiten/interfaces/board.js';
+import type { Board, Column, Lane, Space } from '../kaiten/interfaces/board.js';
 import type { KaitenConfig } from '../kaiten/interfaces/config.js';
 import type { AccessGuard } from './guard.js';
 
@@ -59,5 +59,10 @@ export class BoardService {
   getColumns(boardId: number): Promise<Column[]> {
     this.guard.validateBoardId(boardId);
     return this.api.boards.getColumns(boardId);
+  }
+
+  getLanes(boardId: number): Promise<Lane[]> {
+    this.guard.validateBoardId(boardId);
+    return this.api.boards.getLanes(boardId);
   }
 }

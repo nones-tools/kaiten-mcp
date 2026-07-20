@@ -5,6 +5,7 @@ export const checklistTools: ToolDef[] = [
   {
     name: 'kaiten_get_checklists',
     description: 'Get checklists from a card',
+    annotations: { readOnlyHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
     },
@@ -22,6 +23,7 @@ export const checklistTools: ToolDef[] = [
   {
     name: 'kaiten_delete_checklist',
     description: 'Delete a checklist from a card',
+    annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
       checklistId: z.number().describe('Checklist ID to delete'),
@@ -62,6 +64,7 @@ export const checklistTools: ToolDef[] = [
   {
     name: 'kaiten_delete_checklist_item',
     description: 'Delete an item from a checklist',
+    annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
       checklistId: z.number().describe('Checklist ID'),

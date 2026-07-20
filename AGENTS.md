@@ -1,6 +1,6 @@
 # AGENTS.md — kaiten-mcp for AI agents
 
-MCP server (39 tools) + CLI + typed SDK for the Kaiten API. Package: `@nones/kaiten-mcp`.
+MCP server (45 tools) + CLI + typed SDK for the Kaiten API. Package: `@nones/kaiten-mcp`.
 Read `specs/000-project/spec.md` for the domain model and `.specify/memory/constitution.md`
 for the non-negotiable rules before making structural changes.
 
@@ -35,8 +35,10 @@ bun run pack         # build + npm tarball (bun pm pack)
 
 - **≤ 200 lines per source file.** Split by domain, re-export via the layer's `index.ts`.
 - **stdout is the MCP protocol.** Diagnostics → stderr only.
-- **Behavior is contract.** 39 tool names/schemas/defaults, CLI output, root exports —
-  don't change them in a refactor; breaking changes need a major version bump.
+- **Behavior is contract.** Tool names/schemas/defaults, CLI output, root exports —
+  don't change them in a refactor; breaking changes (renames, removals, semantics changes)
+  need a major version bump. New tools and new optional params are additive and allowed in
+  a minor version (see `.specify/memory/constitution.md` Principle IV, amended 1.1.0).
 - **Tests gate every change**: `bun test` + `bunx tsc --noEmit` green before done.
 - Runtime deps are frozen to `@modelcontextprotocol/sdk` + `zod` (constitution).
 - Non-interactive shell flags only (`rm -f`, `cp -f`, `mv -f`, …) — some systems alias

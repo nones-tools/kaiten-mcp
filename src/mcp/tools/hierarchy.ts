@@ -14,6 +14,7 @@ export const hierarchyTools: ToolDef[] = [
   {
     name: 'kaiten_get_child_cards',
     description: 'Get immediate child cards of a parent card (one level only)',
+    annotations: { readOnlyHint: true },
     inputSchema: {
       cardId: z.number().describe('Parent card ID'),
     },
@@ -22,6 +23,7 @@ export const hierarchyTools: ToolDef[] = [
   {
     name: 'kaiten_get_all_child_cards',
     description: 'Get all child cards of a parent card recursively (includes nested child cards at all levels)',
+    annotations: { readOnlyHint: true },
     inputSchema: {
       cardId: z.number().describe('Parent card ID'),
     },
@@ -30,6 +32,7 @@ export const hierarchyTools: ToolDef[] = [
   {
     name: 'kaiten_get_parent',
     description: 'Get the parent card of a child card/subtask',
+    annotations: { readOnlyHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
     },
@@ -49,6 +52,7 @@ export const hierarchyTools: ToolDef[] = [
   {
     name: 'kaiten_detach_from_parent',
     description: 'Remove parent-child relationship - makes a subtask/child card into an independent card',
+    annotations: { destructiveHint: true },
     inputSchema: {
       cardId: z.number().describe('Card ID'),
     },

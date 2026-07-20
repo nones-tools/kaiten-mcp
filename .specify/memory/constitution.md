@@ -30,11 +30,20 @@ Tracked as beads epic `kaiten-mcp-jtg`. Until extraction, treat the core's barre
 (`src/kaiten/index.ts`) as a frozen package boundary.
 
 ### IV. Behavior-Preserving Changes, Test-Backed
-The public surfaces are contracts: 39 MCP tool names/schemas/defaults, CLI commands and
+The public surfaces are contracts: MCP tool names/schemas/defaults, CLI commands and
 output formats, and the root package exports (`KaitenSDK`, `createSDK`, `KaitenClient`,
 `KaitenApi`, `loadConfig`, entity types). Refactors must not change observable behavior.
 `bun test` (no network, no real credentials) and `bunx tsc --noEmit` must pass before any
 commit; a changed test assertion requires an explicit justification in the commit message.
+
+**Additive vs. breaking, for the MCP tool contract specifically:** a minor version MAY add
+new tools or new optional parameters to existing tools, provided every pre-existing tool
+keeps its name, its existing parameters' names/types/required-ness, its position relative
+to the other pre-existing tools (new tools are appended, never interleaved), and its
+observable defaults. Renaming or removing a tool, renaming/removing/changing the type of an
+existing parameter, making an optional parameter required, or changing an existing default
+requires a major version bump. Tests must encode this distinction explicitly (e.g. a frozen
+ordered list for the pre-existing contract, separate assertions for additive tools).
 
 ### V. Protocol Hygiene & Token Economy
 stdout belongs to the MCP protocol — all diagnostics go to **stderr**. Tool and CLI
@@ -58,4 +67,4 @@ the change that motivates them and must keep `AGENTS.md` and `docs/architecture.
 consistent. Semantic versioning applies to the npm package; breaking any Principle-IV
 contract requires a major version bump.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-20 | **Last Amended**: 2026-07-20
+**Version**: 1.1.0 | **Ratified**: 2026-07-20 | **Last Amended**: 2026-07-20

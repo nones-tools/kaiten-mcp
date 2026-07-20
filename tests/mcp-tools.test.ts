@@ -9,6 +9,16 @@ import { tools } from '../src/mcp/tools/index.js';
  * spec assumed) - this list matches that file exactly, which is the
  * authoritative behavioral reference per the spec ("must match the old
  * mcp-server.js exactly").
+ *
+ * 3.1.0 note: this is an INTENTIONAL contract extension, not a drift. The
+ * first 39 entries (order + required params) are exactly the frozen legacy
+ * contract and must never change without a major version bump. The 6 tools
+ * appended below are purely additive (new tools, closing pre-existing SDK
+ * gaps + a new `kaiten_lanes` lookup) - additive changes are allowed in a
+ * minor version per constitution Principle IV (amended 1.1.0). Also,
+ * `kaiten_update_card` gained optional structured fields alongside the
+ * legacy `data` string, which is why `data` (and `cardId` alone) is now
+ * sufficient - see the "required params match" test below.
  */
 const OLD_TOOLS: { name: string; required: string[] }[] = [
   { name: 'kaiten_spaces', required: [] },
@@ -17,7 +27,7 @@ const OLD_TOOLS: { name: string; required: string[] }[] = [
   { name: 'kaiten_cards', required: [] },
   { name: 'kaiten_card', required: ['cardId'] },
   { name: 'kaiten_create_card', required: ['title', 'boardId', 'columnId'] },
-  { name: 'kaiten_update_card', required: ['cardId', 'data'] },
+  { name: 'kaiten_update_card', required: ['cardId'] },
   { name: 'kaiten_delete_card', required: ['cardId'] },
   { name: 'kaiten_move_card', required: ['cardId', 'columnId'] },
   { name: 'kaiten_assign_card', required: ['cardId', 'userId'] },
@@ -50,6 +60,13 @@ const OLD_TOOLS: { name: string; required: string[] }[] = [
   { name: 'kaiten_download_file', required: ['cardId', 'fileId'] },
   { name: 'kaiten_download_all_files', required: ['cardId'] },
   { name: 'kaiten_clean_temp', required: [] },
+  // --- 3.1.0 additive tools, appended after the frozen 39 above ---
+  { name: 'kaiten_lanes', required: ['boardId'] },
+  { name: 'kaiten_update_comment', required: ['commentId', 'text'] },
+  { name: 'kaiten_delete_comment', required: ['commentId'] },
+  { name: 'kaiten_archive_card', required: ['cardId'] },
+  { name: 'kaiten_unarchive_card', required: ['cardId'] },
+  { name: 'kaiten_unassign_card', required: ['cardId', 'userId'] },
 ];
 
 function toolByName(name: string) {
@@ -105,13 +122,19 @@ function makeStubSdk(overrides: Record<string, (...args: any[]) => any> = {}): K
     downloadFileToDisk: mock(async () => ({ path: '/tmp/x' })),
     downloadAllCardFiles: mock(async () => []),
     cleanTempDir: mock(async () => 0),
+    getLanes: mock(async () => []),
+    updateComment: mock(async () => ({ id: 1 })),
+    deleteComment: mock(async () => undefined),
+    archive: mock(async () => ({ id: 1 })),
+    unarchive: mock(async () => ({ id: 1 })),
+    unassignFrom: mock(async () => ({ id: 1 })),
   };
   return { ...base, ...overrides } as unknown as KaitenSDK;
 }
 
 describe('mcp tool registry', () => {
-  test('has exactly 39 tools (matches old mcp-server.js registerTools() exactly)', () => {
-    expect(tools).toHaveLength(39);
+  test('has exactly 45 tools (39 frozen legacy + 6 additive in 3.1.0)', () => {
+    expect(tools).toHaveLength(45);
   });
 
   test('tool names match the old server list exactly, in order', () => {
@@ -175,7 +198,7 @@ describe('mcp tool handlers - delegation to SDK', () => {
     expect(getCards).toHaveBeenCalledWith(null, null, false);
   });
 
-  test('kaiten_update_card JSON.parses the data string param', async () => {
+  test('kaiten_update_card JSON.parses the legacy data string param (backward compat)', async () => {
     const updateCard = mock(async () => ({ id: 1 }));
     const sdk = makeStubSdk({ updateCard });
     await toolByName('kaiten_update_card').handler(sdk, { cardId: 7, data: '{"title":"new title","size":3}' });
@@ -185,6 +208,56 @@ describe('mcp tool handlers - delegation to SDK', () => {
   test('kaiten_update_card propagates JSON.parse errors for malformed data', async () => {
     const sdk = makeStubSdk();
     await expect(toolByName('kaiten_update_card').handler(sdk, { cardId: 7, data: 'not json' })).rejects.toThrow();
+  });
+
+  test('kaiten_update_card maps structured fields to a snake_case patch', async () => {
+    const updateCard = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ updateCard });
+    await toolByName('kaiten_update_card').handler(sdk, {
+      cardId: 7,
+      title: 'New title',
+      description: 'New description',
+      columnId: 10,
+      laneId: 20,
+      boardId: 30,
+      size: 5,
+      plannedStart: '2026-08-01',
+      plannedEnd: '2026-08-10',
+      dueDate: '2026-08-15',
+      asap: true,
+      condition: 1,
+    });
+    expect(updateCard).toHaveBeenCalledWith(7, {
+      title: 'New title',
+      description: 'New description',
+      column_id: 10,
+      lane_id: 20,
+      board_id: 30,
+      size: 5,
+      planned_start: '2026-08-01',
+      planned_end: '2026-08-10',
+      due_date: '2026-08-15',
+      asap: true,
+      condition: 1,
+    });
+  });
+
+  test('kaiten_update_card overlays explicit structured fields over the legacy data string', async () => {
+    const updateCard = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ updateCard });
+    await toolByName('kaiten_update_card').handler(sdk, {
+      cardId: 7,
+      data: '{"title":"from data","size":3}',
+      title: 'from explicit field',
+    });
+    expect(updateCard).toHaveBeenCalledWith(7, { title: 'from explicit field', size: 3 });
+  });
+
+  test('kaiten_update_card throws when neither data nor any structured field is given', async () => {
+    const sdk = makeStubSdk();
+    await expect(toolByName('kaiten_update_card').handler(sdk, { cardId: 7 })).rejects.toThrow(
+      'No fields to update - pass at least one field'
+    );
   });
 
   test('kaiten_create_card passes laneId through to sdk.createCard', async () => {
@@ -197,7 +270,17 @@ describe('mcp tool handlers - delegation to SDK', () => {
       description: 'D',
       laneId: 42,
     });
-    expect(createCard).toHaveBeenCalledWith({ title: 'T', boardId: 1, columnId: 2, description: 'D', laneId: 42 });
+    expect(createCard).toHaveBeenCalledWith({
+      title: 'T',
+      boardId: 1,
+      columnId: 2,
+      description: 'D',
+      laneId: 42,
+      tags: undefined,
+      size: undefined,
+      plannedStart: undefined,
+      plannedEnd: undefined,
+    });
   });
 
   test('kaiten_create_card works without laneId (undefined passthrough)', async () => {
@@ -210,6 +293,35 @@ describe('mcp tool handlers - delegation to SDK', () => {
       columnId: 2,
       description: undefined,
       laneId: undefined,
+      tags: undefined,
+      size: undefined,
+      plannedStart: undefined,
+      plannedEnd: undefined,
+    });
+  });
+
+  test('kaiten_create_card passes tags/size/plannedStart/plannedEnd through to sdk.createCard', async () => {
+    const createCard = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ createCard });
+    await toolByName('kaiten_create_card').handler(sdk, {
+      title: 'T',
+      boardId: 1,
+      columnId: 2,
+      tags: ['bug', 'urgent'],
+      size: 8,
+      plannedStart: '2026-08-01',
+      plannedEnd: '2026-08-10',
+    });
+    expect(createCard).toHaveBeenCalledWith({
+      title: 'T',
+      boardId: 1,
+      columnId: 2,
+      description: undefined,
+      laneId: undefined,
+      tags: ['bug', 'urgent'],
+      size: 8,
+      plannedStart: '2026-08-01',
+      plannedEnd: '2026-08-10',
     });
   });
 
@@ -362,5 +474,69 @@ describe('mcp tool handlers - delegation to SDK', () => {
     const sdk = makeStubSdk({ findUser });
     await toolByName('kaiten_search_users').handler(sdk, { query: 'Alice' });
     expect(findUser).toHaveBeenCalledWith('Alice');
+  });
+});
+
+describe('mcp tool handlers - 3.1.0 additive tools', () => {
+  test('kaiten_lanes delegates to sdk.getLanes(boardId)', async () => {
+    const getLanes = mock(async () => [{ id: 1, title: 'Lane', board_id: 9 }]);
+    const sdk = makeStubSdk({ getLanes });
+    const result = await toolByName('kaiten_lanes').handler(sdk, { boardId: 9 });
+    expect(getLanes).toHaveBeenCalledWith(9);
+    expect(result).toEqual([{ id: 1, title: 'Lane', board_id: 9 }]);
+  });
+
+  test('kaiten_update_comment delegates to sdk.updateComment(commentId, text)', async () => {
+    const updateComment = mock(async () => ({ id: 5 }));
+    const sdk = makeStubSdk({ updateComment });
+    await toolByName('kaiten_update_comment').handler(sdk, { commentId: 5, text: 'edited' });
+    expect(updateComment).toHaveBeenCalledWith(5, 'edited');
+  });
+
+  test('kaiten_delete_comment delegates to sdk.deleteComment(commentId)', async () => {
+    const deleteComment = mock(async () => undefined);
+    const sdk = makeStubSdk({ deleteComment });
+    await toolByName('kaiten_delete_comment').handler(sdk, { commentId: 5 });
+    expect(deleteComment).toHaveBeenCalledWith(5);
+  });
+
+  test('kaiten_archive_card delegates to sdk.archive(cardId)', async () => {
+    const archive = mock(async () => ({ id: 1, condition: 2 }));
+    const sdk = makeStubSdk({ archive });
+    await toolByName('kaiten_archive_card').handler(sdk, { cardId: 1 });
+    expect(archive).toHaveBeenCalledWith(1);
+  });
+
+  test('kaiten_unarchive_card delegates to sdk.unarchive(cardId)', async () => {
+    const unarchive = mock(async () => ({ id: 1, condition: 1 }));
+    const sdk = makeStubSdk({ unarchive });
+    await toolByName('kaiten_unarchive_card').handler(sdk, { cardId: 1 });
+    expect(unarchive).toHaveBeenCalledWith(1);
+  });
+
+  test('kaiten_unassign_card delegates to sdk.unassignFrom(cardId, userId)', async () => {
+    const unassignFrom = mock(async () => ({ id: 1 }));
+    const sdk = makeStubSdk({ unassignFrom });
+    await toolByName('kaiten_unassign_card').handler(sdk, { cardId: 1, userId: 2 });
+    expect(unassignFrom).toHaveBeenCalledWith(1, 2);
+  });
+});
+
+describe('mcp tool annotations', () => {
+  test('read-only tools are marked readOnlyHint: true', () => {
+    for (const name of ['kaiten_spaces', 'kaiten_cards', 'kaiten_card', 'kaiten_lanes', 'kaiten_get_checklists']) {
+      expect(toolByName(name).annotations?.readOnlyHint).toBe(true);
+    }
+  });
+
+  test('destructive tools are marked destructiveHint: true', () => {
+    for (const name of ['kaiten_delete_card', 'kaiten_delete_comment', 'kaiten_remove_tag', 'kaiten_clean_temp']) {
+      expect(toolByName(name).annotations?.destructiveHint).toBe(true);
+    }
+  });
+
+  test('mutating non-destructive tools carry no annotations by default', () => {
+    expect(toolByName('kaiten_create_card').annotations).toBeUndefined();
+    expect(toolByName('kaiten_assign_card').annotations).toBeUndefined();
   });
 });
