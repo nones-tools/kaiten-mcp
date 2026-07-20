@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { loadConfig, parseEnvFile } from '../src/kaiten';
+import { loadConfig, parseEnvFile } from '@/kaiten';
 
 describe('parseEnvFile', () => {
   it('parses simple KEY=VALUE lines', () => {

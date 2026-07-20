@@ -1,4 +1,4 @@
-import { KaitenClient } from '../../src/kaiten';
+import { KaitenClient } from '@/kaiten';
 
 export interface Canned {
   status?: number;

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import type { ServiceIdentifier } from 'inversify';
-import { buildContainer, TOKENS } from '../src/di';
-import { KaitenClient, type KaitenApiPort } from '../src/kaiten';
-import { KaitenSDK } from '../src/sdk';
+import { buildContainer, TOKENS } from '@/di';
+import { KaitenClient, type KaitenApiPort } from '@/kaiten';
+import { KaitenSDK } from '@/sdk';
 import { createFakeFetch } from './api/helpers';
 
 function makeContainer(responses: Parameters<typeof createFakeFetch>[0] = []) {

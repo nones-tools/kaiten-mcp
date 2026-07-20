@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { cleanTempDir, getCardTempDir } from '../src/lib';
+import { cleanTempDir, getCardTempDir } from '@/lib';
 
 // NOTE on KAITEN_TEMP_DIR: src/lib/temp.ts reads process.env.KAITEN_TEMP_DIR
 // into a module-level constant at import time. Verified empirically that
 // bun:test shares a single ES module cache across all test files in a run,
 // so setting KAITEN_TEMP_DIR before a dynamic import() only works if this is
-// the very first file (in any test run) to import '../src/lib/temp.js' - not something
+// the very first file (in any test run) to import '@/lib/temp.js' - not something
 // this file can guarantee given other test files may import it first
 // (directly, or transitively via sdk.ts). These tests therefore exercise the
 // real default base dir (`/tmp/kaiten`) and rely on unique per-test cardIds

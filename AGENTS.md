@@ -43,6 +43,9 @@ bun run pack         # build + npm tarball (bun pm pack)
 - **Tests gate every change**: `bun test` + `bunx tsc --noEmit` green before done.
 - Runtime deps are frozen to `@modelcontextprotocol/sdk` + `zod` + `inversify` +
   `reflect-metadata` (constitution, amended 1.2.0).
+- **Import alias `@/*` → `src/*`** (tsconfig paths): use it in `tests/**`. Keep `src/**`
+  on relative imports — `tsc` emits declaration files with original specifiers, so `@/` in
+  `src` would ship broken `.d.ts` paths to consumers.
 - Non-interactive shell flags only (`rm -f`, `cp -f`, `mv -f`, …) — some systems alias
   these to `-i` and an agent will hang on the prompt.
 

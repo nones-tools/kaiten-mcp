@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import type { ToolContext } from '../src/interfaces';
-import { KaitenClient } from '../src/kaiten';
-import { compose, errorHook, loggingHook } from '../src/mcp/hooks';
-import { tools } from '../src/mcp/tools';
-import { KaitenSDK } from '../src/sdk';
+import type { ToolContext } from '@/interfaces';
+import { KaitenClient } from '@/kaiten';
+import { compose, errorHook, loggingHook } from '@/mcp/hooks';
+import { tools } from '@/mcp/tools';
+import { KaitenSDK } from '@/sdk';
 
 /**
  * Runs a tool call through the exact same hook chain server.ts uses, so a

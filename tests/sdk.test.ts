@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { KaitenClient } from '../src/kaiten';
-import { KaitenSDK } from '../src/sdk';
-import type { KaitenConfig } from '../src/kaiten';
+import { KaitenClient } from '@/kaiten';
+import { KaitenSDK } from '@/sdk';
+import type { KaitenConfig } from '@/kaiten';
 
 interface Canned {
   status?: number;

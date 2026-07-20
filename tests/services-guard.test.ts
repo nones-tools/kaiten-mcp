@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
-import type { KaitenApi } from '../src/kaiten';
-import { AccessGuard } from '../src/services';
+import type { KaitenApi } from '@/kaiten';
+import { AccessGuard } from '@/services';
 
 function makeGuard(
   config: { allowedSpaceIds?: number[] | null; allowedBoardIds?: number[] | null },

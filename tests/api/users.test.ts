@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { UsersApi } from '../../src/kaiten';
+import { UsersApi } from '@/kaiten';
 import { createFakeFetch, makeClient } from './helpers';
 
 describe('UsersApi', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { CardsApi } from '../../src/kaiten';
+import { CardsApi } from '@/kaiten';
 import { createFakeFetch, makeClient } from './helpers';
 describe('CardsApi', () => {
   it('getCards without boardId hits /spaces/{id}/cards', async () => {

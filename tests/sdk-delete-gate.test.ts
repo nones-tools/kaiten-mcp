@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { KaitenClient, KaitenDeleteDisabledError } from '../src/kaiten';
-import { KaitenSDK } from '../src/sdk';
+import { KaitenClient, KaitenDeleteDisabledError } from '@/kaiten';
+import { KaitenSDK } from '@/sdk';
 
 interface Call {
   method: string;

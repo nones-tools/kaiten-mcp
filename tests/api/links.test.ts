@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { LinksApi } from '../../src/kaiten';
+import { LinksApi } from '@/kaiten';
 import { createFakeFetch, makeClient } from './helpers';
 
 describe('LinksApi', () => {

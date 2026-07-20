@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { SubtasksApi } from '../../src/kaiten';
+import { SubtasksApi } from '@/kaiten';
 import { createFakeFetch, makeClient } from './helpers';
 
 describe('SubtasksApi', () => {
