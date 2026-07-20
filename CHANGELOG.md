@@ -5,7 +5,7 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
-## Unreleased
+## 3.2.1 — 2026-07-20
 
 ### Added
 
@@ -21,6 +21,16 @@ additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
   1.2.0). `src/kaiten/` (Kaiten Core) stays undecorated and framework-free — nothing
   under it imports `inversify`; `KaitenClient`/`KaitenApi` are bound in the container via
   factory bindings (`toDynamicValue`).
+
+- TypeScript path alias `@/*` → `src/*` (tsconfig `paths`); test suite imports through it.
+
+### Changed
+
+- Relative imports lost their `.js` extensions; cross-directory imports go through
+  directory barrels; `node:` import prefixes replaced with bare specifiers (identical
+  behavior on Node and Bun).
+- README: manual MCP connection recipe (token read from a local `.env` via `sh -c`),
+  Kaiten URLs generalized to `https://<kaiten_url>/api/latest`.
 
 No breaking changes: `new KaitenSDK(options)` / `createSDK(options)` keep their exact
 pre-DI constructor signature and behavior (they build a container internally), and every
