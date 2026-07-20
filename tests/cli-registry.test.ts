@@ -1,7 +1,7 @@
 import { describe, expect, it, mock } from 'bun:test';
-import type { CliCommand, CliDeps } from '../src/interfaces/command.js';
-import type { KaitenSDK } from '../src/sdk.js';
-import { buildRegistry, commands } from '../src/cli/registry.js';
+import type { CliCommand, CliDeps } from '../src/interfaces';
+import type { KaitenSDK } from '../src/sdk';
+import { buildRegistry, commands } from '../src/cli/registry';
 
 const fakeDeps: CliDeps = {
   getSdk(): KaitenSDK {

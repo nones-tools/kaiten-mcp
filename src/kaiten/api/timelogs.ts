@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { TimeLog } from '../interfaces/timelog.js';
+import type { HttpTransport, TimeLog } from '../interfaces';
 
 export class TimeLogsApi {
   constructor(private readonly client: HttpTransport) {}

@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { Card } from '../interfaces/card.js';
+import type { Card, HttpTransport } from '../interfaces';
 
 export class SubtasksApi {
   constructor(private readonly client: HttpTransport) {}

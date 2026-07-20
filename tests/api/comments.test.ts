@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { CommentsApi } from '../../src/kaiten/api/comments.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { CommentsApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('CommentsApi', () => {
   it('getComments GETs /cards/{id}/comments', async () => {

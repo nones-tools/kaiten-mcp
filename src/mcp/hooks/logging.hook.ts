@@ -1,5 +1,5 @@
-import type { ToolHook } from '../../interfaces/hook.js';
-import { debugLog } from '../logger.js';
+import type { ToolHook } from '../../interfaces';
+import { debugLog } from '../logger';
 
 /** Outermost hook: debug-logs every tool invocation to stderr (honors KAITEN_LOG_LEVEL). */
 export const loggingHook: ToolHook = async (ctx, next) => {

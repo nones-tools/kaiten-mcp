@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { CardFile } from '../interfaces/card.js';
+import type { CardFile, HttpTransport } from '../interfaces';
 
 export class FilesApi {
   constructor(private readonly client: HttpTransport) {}

@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { loadConfig } from '../src/kaiten/config.js';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { loadConfig } from '../src/kaiten';
 
 describe('loadConfig - KAITEN_API_DELETE_ALLOW parsing', () => {
   let tmpDir: string;

@@ -1,6 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { CardBlocker } from '../kaiten/interfaces/blocker.js';
-import type { AccessGuard } from './guard.js';
+import type { CardBlocker, KaitenApi } from '../kaiten';
+import type { AccessGuard } from './guard';
 
 export class BlockerService {
   constructor(

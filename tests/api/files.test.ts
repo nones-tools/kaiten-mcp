@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { FilesApi } from '../../src/kaiten/api/files.js';
-import { KaitenClient } from '../../src/kaiten/http/index.js';
-import { createFakeFetch, makeClient, type Call } from './helpers.js';
+import { FilesApi, KaitenClient } from '../../src/kaiten';
+import { createFakeFetch, makeClient, type Call } from './helpers';
 
 describe('FilesApi', () => {
   it('getCardFiles GETs /cards/{id}/files', async () => {

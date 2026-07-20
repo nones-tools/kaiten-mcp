@@ -1,4 +1,4 @@
-import type { CliCommand } from '../../interfaces/command.js';
+import type { CliCommand } from '../../interfaces';
 
 export const boardCommand: CliCommand = {
   name: 'board',

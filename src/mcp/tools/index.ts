@@ -1,18 +1,18 @@
-import type { ToolDef } from '../../interfaces/tool.js';
-import { blockerTools } from './blockers.js';
-import { cardTools, newCardTools } from './cards.js';
-import { checklistTools } from './checklists.js';
-import { commentTools, newCommentTools, tagTools } from './comments-tags.js';
-import { dictionaryTools } from './dictionaries.js';
-import { fileTools, newFileTools } from './files.js';
-import { gitTools } from './git.js';
-import { hierarchyTools } from './hierarchy.js';
-import { linkTools } from './links.js';
-import { navigationTools, newNavigationTools } from './navigation.js';
-import { timeLogTools } from './timelogs.js';
-import { newUserTools, userTools } from './users.js';
+import type { ToolDef } from '../../interfaces';
+import { blockerTools } from './blockers';
+import { cardTools, newCardTools } from './cards';
+import { checklistTools } from './checklists';
+import { commentTools, newCommentTools, tagTools } from './comments-tags';
+import { dictionaryTools } from './dictionaries';
+import { fileTools, newFileTools } from './files';
+import { gitTools } from './git';
+import { hierarchyTools } from './hierarchy';
+import { linkTools } from './links';
+import { navigationTools, newNavigationTools } from './navigation';
+import { timeLogTools } from './timelogs';
+import { newUserTools, userTools } from './users';
 
-export type { ToolDef } from '../../interfaces/tool.js';
+export type { ToolDef } from '../../interfaces';
 
 /**
  * Full tool registry, concatenated in EXACTLY the order the old monolithic

@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import type { ToolContext } from '../interfaces/hook.js';
-import { KaitenSDK } from '../sdk.js';
-import { compose, errorHook, loggingHook } from './hooks/index.js';
-import { errorLog, logLevel } from './logger.js';
-import { tools } from './tools/index.js';
+import type { ToolContext } from '../interfaces';
+import { KaitenSDK } from '../sdk';
+import { compose, errorHook, loggingHook } from './hooks';
+import { errorLog, logLevel } from './logger';
+import { tools } from './tools';
 
 /**
  * Version comes from package.json at runtime (not a hardcoded literal) so

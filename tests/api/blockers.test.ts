@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { BlockersApi } from '../../src/kaiten/api/blockers.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { BlockersApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('BlockersApi', () => {
   it('getBlockers GETs /cards/{id}/blockers', async () => {

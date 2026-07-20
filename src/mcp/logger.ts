@@ -1,5 +1,5 @@
-import { loadConfig } from '../kaiten/config.js';
-import type { KaitenConfig } from '../kaiten/interfaces/config.js';
+import { loadConfig } from '../kaiten';
+import type { KaitenConfig } from '../kaiten';
 
 const LOG_LEVELS: Record<KaitenConfig['logLevel'], number> = {
   error: 0,

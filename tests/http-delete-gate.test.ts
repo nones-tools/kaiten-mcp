@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { KaitenClient, KaitenDeleteDisabledError } from '../src/kaiten/http/index.js';
+import { KaitenClient, KaitenDeleteDisabledError } from '../src/kaiten';
 
 function makeClient(fetchImpl: typeof fetch, allowDelete?: boolean): KaitenClient {
   return new KaitenClient({ apiUrl: 'https://api.example.com', apiToken: 'test-token', fetchImpl, allowDelete });

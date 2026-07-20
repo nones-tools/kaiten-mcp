@@ -1,6 +1,4 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Tag } from '../kaiten/interfaces/card.js';
-import type { CardType, CustomProperty } from '../kaiten/interfaces/company.js';
+import type { CardType, CustomProperty, KaitenApi, Tag } from '../kaiten';
 
 /**
  * Company-wide read-only dictionaries (tags, card types, custom property

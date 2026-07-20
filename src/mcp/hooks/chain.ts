@@ -1,4 +1,4 @@
-import type { ToolContext, ToolHook, ToolTerminal } from '../../interfaces/hook.js';
+import type { ToolContext, ToolHook, ToolTerminal } from '../../interfaces';
 
 /**
  * Composes hooks (chain of responsibility, koa-style) around a terminal

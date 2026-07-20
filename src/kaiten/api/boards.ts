@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { Board, Column, Lane, Space } from '../interfaces/board.js';
+import type { Board, Column, HttpTransport, Lane, Space } from '../interfaces';
 
 export class BoardsApi {
   constructor(private readonly client: HttpTransport) {}

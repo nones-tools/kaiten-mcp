@@ -1,6 +1,4 @@
-import type { Tag } from '../interfaces/card.js';
-import type { CardType, CustomProperty } from '../interfaces/company.js';
-import type { HttpTransport } from '../interfaces/http.js';
+import type { CardType, CustomProperty, HttpTransport, Tag } from '../interfaces';
 
 /** Company-wide read-only dictionaries: tags, card types, custom property definitions. */
 export class CompanyApi {

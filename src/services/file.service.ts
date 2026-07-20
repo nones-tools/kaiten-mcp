@@ -1,9 +1,8 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { CardFile } from '../kaiten/interfaces/card.js';
-import { cleanTempDir as cleanTempDirFs, getCardTempDir } from '../lib/temp.js';
-import type { AccessGuard } from './guard.js';
+import fs from 'fs/promises';
+import path from 'path';
+import type { CardFile, KaitenApi } from '../kaiten';
+import { cleanTempDir as cleanTempDirFs, getCardTempDir } from '../lib';
+import type { AccessGuard } from './guard';
 
 export class FileService {
   constructor(

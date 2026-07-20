@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { UsersApi } from '../../src/kaiten/api/users.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { UsersApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('UsersApi', () => {
   it('getUsers GETs /users', async () => {

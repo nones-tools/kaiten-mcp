@@ -1,8 +1,6 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Card } from '../kaiten/interfaces/card.js';
-import type { KaitenConfig } from '../kaiten/interfaces/config.js';
-import type { AccessGuard } from './guard.js';
-import { type MinimalCard, toMinimalCard } from './projections.js';
+import type { Card, KaitenApi, KaitenConfig } from '../kaiten';
+import type { AccessGuard } from './guard';
+import { type MinimalCard, toMinimalCard } from './projections';
 
 export interface CreateCardInput {
   title: string;

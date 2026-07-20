@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { Comment } from '../interfaces/comment.js';
+import type { Comment, HttpTransport } from '../interfaces';
 
 export class CommentsApi {
   constructor(private readonly client: HttpTransport) {}

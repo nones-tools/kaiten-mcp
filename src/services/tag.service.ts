@@ -1,8 +1,7 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Card } from '../kaiten/interfaces/card.js';
-import type { CardService } from './card.service.js';
-import type { AccessGuard } from './guard.js';
-import { type TaggedCard, toTaggedCard } from './projections.js';
+import type { Card, KaitenApi } from '../kaiten';
+import type { CardService } from './card.service';
+import type { AccessGuard } from './guard';
+import { type TaggedCard, toTaggedCard } from './projections';
 
 export class TagService {
   constructor(

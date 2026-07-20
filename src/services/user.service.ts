@@ -1,5 +1,4 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { User } from '../kaiten/interfaces/user.js';
+import type { KaitenApi, User } from '../kaiten';
 
 export class UserService {
   constructor(private readonly api: KaitenApi) {}

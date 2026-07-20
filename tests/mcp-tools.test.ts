@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from 'bun:test';
-import type { KaitenSDK } from '../src/sdk.js';
-import { tools } from '../src/mcp/tools/index.js';
+import type { KaitenSDK } from '../src/sdk';
+import { tools } from '../src/mcp/tools';
 
 /**
  * Expected tool list + required-param sets, transcribed directly from the

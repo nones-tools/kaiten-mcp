@@ -1,4 +1,4 @@
-import type { Card } from '../kaiten/interfaces/card.js';
+import type { Card } from '../kaiten';
 
 export interface MinimalCard {
   id: number;

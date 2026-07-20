@@ -1,3 +1,3 @@
-export type { CliCommand, CliDeps } from './command.js';
-export type { ToolContext, ToolHook, ToolResponse, ToolTerminal } from './hook.js';
-export type { ToolDef } from './tool.js';
+export type { CliCommand, CliDeps } from './command';
+export type { ToolContext, ToolHook, ToolResponse, ToolTerminal } from './hook';
+export type { ToolDef } from './tool';

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import type { CliDeps } from '../interfaces/command.js';
-import { KaitenApiError } from '../kaiten/index.js';
-import { createSDK, type KaitenSDK } from '../sdk.js';
-import { buildRegistry } from './registry.js';
+import type { CliDeps } from '../interfaces';
+import { KaitenApiError } from '../kaiten';
+import { createSDK, type KaitenSDK } from '../sdk';
+import { buildRegistry } from './registry';
 
 const args = process.argv.slice(2);
 const command = args[0];

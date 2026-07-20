@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { CardBlocker } from '../interfaces/blocker.js';
+import type { CardBlocker, HttpTransport } from '../interfaces';
 
 export class BlockersApi {
   constructor(private readonly client: HttpTransport) {}

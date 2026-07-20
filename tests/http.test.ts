@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { KaitenApiError, KaitenClient } from '../src/kaiten/http/index.js';
+import { KaitenApiError, KaitenClient } from '../src/kaiten';
 
 // allowDelete: true by default here - this file tests the client's request
 // shaping across HTTP methods, not the DELETE gate. The gate has its own

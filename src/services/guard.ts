@@ -1,5 +1,4 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { KaitenConfig } from '../kaiten/interfaces/config.js';
+import type { KaitenApi, KaitenConfig } from '../kaiten';
 
 /**
  * Enforces the KAITEN_ALLOWED_SPACE_IDS / KAITEN_ALLOWED_BOARD_IDS

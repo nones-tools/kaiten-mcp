@@ -1,5 +1,5 @@
-import type { HttpTransport, QueryParams } from '../interfaces/http.js';
-import { KaitenApiError, KaitenDeleteDisabledError } from './errors.js';
+import type { HttpTransport, QueryParams } from '../interfaces';
+import { KaitenApiError, KaitenDeleteDisabledError } from './errors';
 
 export interface KaitenClientOptions {
   apiUrl: string;
@@ -15,7 +15,7 @@ export interface KaitenClientOptions {
   allowDelete?: boolean;
 }
 
-export type { QueryParams } from '../interfaces/http.js';
+export type { QueryParams } from '../interfaces';
 
 /** Adapts native `fetch` to the `HttpTransport` contract the API layer uses. */
 export class KaitenClient implements HttpTransport {

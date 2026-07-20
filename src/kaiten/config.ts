@@ -1,9 +1,9 @@
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import type { KaitenConfig } from './interfaces/config.js';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import type { KaitenConfig } from './interfaces';
 
-export type { KaitenConfig } from './interfaces/config.js';
+export type { KaitenConfig } from './interfaces';
 
 /**
  * Parses `KEY=VALUE` lines, ignoring blank lines and `#` comments. Values may

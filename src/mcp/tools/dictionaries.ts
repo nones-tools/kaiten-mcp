@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { ToolDef } from '../../interfaces/tool.js';
+import type { ToolDef } from '../../interfaces';
 
 /**
  * 3.2.0 company-wide read-only dictionaries - appended at the end of the

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 const CLI_PATH = path.join(import.meta.dir, '..', 'src', 'cli', 'index.ts');
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import type { Card } from '../../kaiten/interfaces/card.js';
-import type { ToolDef } from '../../interfaces/tool.js';
+import type { Card } from '../../kaiten';
+import type { ToolDef } from '../../interfaces';
 
 export const cardTools: ToolDef[] = [
   {

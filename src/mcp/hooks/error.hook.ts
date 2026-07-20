@@ -1,6 +1,6 @@
-import type { ToolHook } from '../../interfaces/hook.js';
-import { KaitenApiError } from '../../kaiten/http/errors.js';
-import { errorLog } from '../logger.js';
+import type { ToolHook } from '../../interfaces';
+import { KaitenApiError } from '../../kaiten';
+import { errorLog } from '../logger';
 
 /**
  * Catches failures from the handler and formats them into the exact error

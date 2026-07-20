@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { BoardsApi } from '../../src/kaiten/api/boards.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { BoardsApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('BoardsApi', () => {
   it('getSpaces GETs /spaces', async () => {

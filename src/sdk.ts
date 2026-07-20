@@ -1,43 +1,18 @@
-import { KaitenApi } from './kaiten/api/index.js';
-import { loadConfig, type KaitenConfig } from './kaiten/config.js';
-import { KaitenClient } from './kaiten/http/client.js';
-import type {
-  Board,
-  Card,
-  CardBlocker,
-  CardFile,
-  CardType,
-  Checklist,
-  ChecklistItem,
-  Column,
-  Comment,
-  CustomProperty,
-  ExternalLink,
-  Lane,
-  Space,
-  Tag,
-  TimeLog,
-  User,
-} from './kaiten/interfaces/index.js';
-import { BlockerService } from './services/blocker.service.js';
-import { BoardService } from './services/board.service.js';
-import { CardService, type CreateCardInput } from './services/card.service.js';
-import { ChecklistService } from './services/checklist.service.js';
-import { CommentService } from './services/comment.service.js';
-import { DictionaryService } from './services/dictionary.service.js';
-import { FileService } from './services/file.service.js';
-import { GitService } from './services/git.service.js';
-import { AccessGuard } from './services/guard.js';
-import { HierarchyService, type TaskFlowTask } from './services/hierarchy.service.js';
-import { LinkService } from './services/link.service.js';
-import type { MinimalCard, MinimalParent, MinimalSubtask, TaggedCard } from './services/projections.js';
-import { TagService } from './services/tag.service.js';
-import { TimeLogService } from './services/timelog.service.js';
-import { UserService } from './services/user.service.js';
+import {
+  KaitenApi, KaitenClient, loadConfig,
+  type Board, type Card, type CardBlocker, type CardFile, type CardType,
+  type Checklist, type ChecklistItem, type Column, type Comment, type CustomProperty,
+  type ExternalLink, type KaitenConfig, type Lane, type Space, type Tag, type TimeLog, type User,
+} from './kaiten';
+import {
+  AccessGuard, BlockerService, BoardService, CardService, ChecklistService, CommentService,
+  DictionaryService, FileService, GitService, HierarchyService, LinkService, TagService,
+  TimeLogService, UserService,
+  type CreateCardInput, type MinimalCard, type MinimalParent, type MinimalSubtask,
+  type TaggedCard, type TaskFlowTask,
+} from './services';
 
-export type { CreateCardInput } from './services/card.service.js';
-export type { TaskFlowTask } from './services/hierarchy.service.js';
-export type { MinimalCard, MinimalParent, MinimalSubtask, TaggedCard } from './services/projections.js';
+export type { CreateCardInput, MinimalCard, MinimalParent, MinimalSubtask, TaggedCard, TaskFlowTask } from './services';
 
 export interface KaitenSDKOptions extends Partial<KaitenConfig> {
   client?: KaitenClient;

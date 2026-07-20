@@ -1,5 +1,5 @@
-import type { CliCommand } from '../../interfaces/command.js';
-import { HELP_TEXT } from '../help.js';
+import type { CliCommand } from '../../interfaces';
+import { HELP_TEXT } from '../help';
 
 export const helpCommand: CliCommand = {
   name: 'help',

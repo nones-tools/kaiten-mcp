@@ -1,4 +1,4 @@
-import type { Card } from '../kaiten/interfaces/card.js';
+import type { Card } from '../kaiten';
 
 // Kaiten's API returns many more fields than `Card` models (see
 // src/kaiten/interfaces/card.ts); these projections reach past the typed

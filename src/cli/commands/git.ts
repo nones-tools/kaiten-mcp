@@ -1,5 +1,5 @@
-import type { CliCommand } from '../../interfaces/command.js';
-import type { Card } from '../../kaiten/interfaces/card.js';
+import type { CliCommand } from '../../interfaces';
+import type { Card } from '../../kaiten';
 
 export const gitBranchCommand: CliCommand = {
   name: 'git-branch',

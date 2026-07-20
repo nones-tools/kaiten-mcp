@@ -1,11 +1,5 @@
-import type { CliCommand } from '../interfaces/command.js';
-import { assignCommand, cardCommand, cardsCommand, cardSimpleCommand, createCommand, deleteCommand, moveCommand, simpleCommand, updateCommand } from './commands/cards.js';
-import { commentCommand } from './commands/comments.js';
-import { gitBranchCommand, gitCheckoutCommand, gitCommitCommand, gitPushCommand, gitStatusCommand } from './commands/git.js';
-import { helpCommand } from './commands/help.js';
-import { boardCommand, columnCommand, userCommand } from './commands/navigation.js';
-import { subtaskCommand } from './commands/subtasks.js';
-import { findCommand, tagCommand } from './commands/tags.js';
+import type { CliCommand } from '../interfaces';
+import { assignCommand, boardCommand, cardCommand, cardsCommand, cardSimpleCommand, columnCommand, commentCommand, createCommand, deleteCommand, findCommand, gitBranchCommand, gitCheckoutCommand, gitCommitCommand, gitPushCommand, gitStatusCommand, helpCommand, moveCommand, simpleCommand, subtaskCommand, tagCommand, updateCommand, userCommand } from './commands';
 
 /** Every CLI command, in help-text order. Adding a command = one entry here + its module. */
 export const commands: CliCommand[] = [

@@ -1,6 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { ExternalLink } from '../kaiten/interfaces/link.js';
-import type { AccessGuard } from './guard.js';
+import type { ExternalLink, KaitenApi } from '../kaiten';
+import type { AccessGuard } from './guard';
 
 export class LinkService {
   constructor(

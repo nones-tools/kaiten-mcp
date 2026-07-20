@@ -1,6 +1,6 @@
-import type { CliCommand } from '../../interfaces/command.js';
-import type { Card } from '../../kaiten/interfaces/card.js';
-import { optimizeCard, optimizeCardDetails } from '../projections.js';
+import type { CliCommand } from '../../interfaces';
+import type { Card } from '../../kaiten';
+import { optimizeCard, optimizeCardDetails } from '../projections';
 
 export const cardsCommand: CliCommand = {
   name: 'cards',

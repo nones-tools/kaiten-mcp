@@ -1,23 +1,23 @@
-export { BlockerService } from './blocker.service.js';
-export { BoardService } from './board.service.js';
-export { CardService } from './card.service.js';
-export type { CreateCardInput } from './card.service.js';
-export { ChecklistService } from './checklist.service.js';
-export { CommentService } from './comment.service.js';
-export { DictionaryService } from './dictionary.service.js';
-export { FileService } from './file.service.js';
-export { GitService } from './git.service.js';
-export { AccessGuard } from './guard.js';
-export { HierarchyService } from './hierarchy.service.js';
-export type { TaskFlowTask } from './hierarchy.service.js';
-export { LinkService } from './link.service.js';
+export { BlockerService } from './blocker.service';
+export { BoardService } from './board.service';
+export { CardService } from './card.service';
+export type { CreateCardInput } from './card.service';
+export { ChecklistService } from './checklist.service';
+export { CommentService } from './comment.service';
+export { DictionaryService } from './dictionary.service';
+export { FileService } from './file.service';
+export { GitService } from './git.service';
+export { AccessGuard } from './guard';
+export { HierarchyService } from './hierarchy.service';
+export type { TaskFlowTask } from './hierarchy.service';
+export { LinkService } from './link.service';
 export {
   toMinimalCard,
   toMinimalParent,
   toMinimalSubtask,
   toTaggedCard,
-} from './projections.js';
-export type { MinimalCard, MinimalParent, MinimalSubtask, TaggedCard } from './projections.js';
-export { TagService } from './tag.service.js';
-export { TimeLogService } from './timelog.service.js';
-export { UserService } from './user.service.js';
+} from './projections';
+export type { MinimalCard, MinimalParent, MinimalSubtask, TaggedCard } from './projections';
+export { TagService } from './tag.service';
+export { TimeLogService } from './timelog.service';
+export { UserService } from './user.service';

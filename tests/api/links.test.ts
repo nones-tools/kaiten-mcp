@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { LinksApi } from '../../src/kaiten/api/links.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { LinksApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('LinksApi', () => {
   it('getExternalLinks GETs /cards/{id}/external-links', async () => {

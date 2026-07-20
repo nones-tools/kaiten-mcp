@@ -1,4 +1,4 @@
-import type { KaitenSDK } from '../sdk.js';
+import type { KaitenSDK } from '../sdk';
 
 /** Dependencies handed to every CLI command (SDK is lazy so `help` works without credentials). */
 export interface CliDeps {

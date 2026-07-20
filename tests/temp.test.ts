@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { cleanTempDir, getCardTempDir } from '../src/lib/temp.js';
+import { cleanTempDir, getCardTempDir } from '../src/lib';
 
 // NOTE on KAITEN_TEMP_DIR: src/lib/temp.ts reads process.env.KAITEN_TEMP_DIR
 // into a module-level constant at import time. Verified empirically that

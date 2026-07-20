@@ -1,6 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { Card, Checklist, ChecklistItem, Tag } from '../interfaces/card.js';
-import type { Column } from '../interfaces/board.js';
+import type { Card, Checklist, ChecklistItem, Column, HttpTransport, Tag } from '../interfaces';
 
 export class CardsApi {
   constructor(private readonly client: HttpTransport) {}

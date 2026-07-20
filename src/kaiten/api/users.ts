@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { User } from '../interfaces/user.js';
+import type { HttpTransport, User } from '../interfaces';
 
 export class UsersApi {
   constructor(private readonly client: HttpTransport) {}

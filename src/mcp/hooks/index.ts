@@ -1,3 +1,3 @@
-export { compose } from './chain.js';
-export { errorHook } from './error.hook.js';
-export { loggingHook } from './logging.hook.js';
+export { compose } from './chain';
+export { errorHook } from './error.hook';
+export { loggingHook } from './logging.hook';

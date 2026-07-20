@@ -1,8 +1,7 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Card } from '../kaiten/interfaces/card.js';
-import type { CardService } from './card.service.js';
-import type { AccessGuard } from './guard.js';
-import { type MinimalParent, type MinimalSubtask, toMinimalParent, toMinimalSubtask } from './projections.js';
+import type { Card, KaitenApi } from '../kaiten';
+import type { CardService } from './card.service';
+import type { AccessGuard } from './guard';
+import { type MinimalParent, type MinimalSubtask, toMinimalParent, toMinimalSubtask } from './projections';
 
 export interface TaskFlowTask {
   title: string;

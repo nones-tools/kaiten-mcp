@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { ToolDef } from '../../interfaces/tool.js';
+import type { ToolDef } from '../../interfaces';
 
 export const checklistTools: ToolDef[] = [
   {

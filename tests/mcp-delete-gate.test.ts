@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import type { ToolContext } from '../src/interfaces/hook.js';
-import { KaitenClient } from '../src/kaiten/http/index.js';
-import { compose, errorHook, loggingHook } from '../src/mcp/hooks/index.js';
-import { tools } from '../src/mcp/tools/index.js';
-import { KaitenSDK } from '../src/sdk.js';
+import type { ToolContext } from '../src/interfaces';
+import { KaitenClient } from '../src/kaiten';
+import { compose, errorHook, loggingHook } from '../src/mcp/hooks';
+import { tools } from '../src/mcp/tools';
+import { KaitenSDK } from '../src/sdk';
 
 /**
  * Reproduces the exact wiring server.ts uses to run a tool call through the

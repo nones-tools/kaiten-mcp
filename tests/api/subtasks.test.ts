@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { SubtasksApi } from '../../src/kaiten/api/subtasks.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { SubtasksApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('SubtasksApi', () => {
   it('createSubtask creates a card on the parent board/column, then POSTs to attach it as a child', async () => {

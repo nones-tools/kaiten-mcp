@@ -1,6 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Comment } from '../kaiten/interfaces/comment.js';
-import type { AccessGuard } from './guard.js';
+import type { Comment, KaitenApi } from '../kaiten';
+import type { AccessGuard } from './guard';
 
 export class CommentService {
   constructor(

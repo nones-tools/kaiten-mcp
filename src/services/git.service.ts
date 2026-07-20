@@ -1,5 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import * as gitApi from '../lib/git.js';
+import type { KaitenApi } from '../kaiten';
+import * as gitApi from '../lib';
 
 export class GitService {
   constructor(private readonly api: KaitenApi) {}

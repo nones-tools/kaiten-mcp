@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import type { KaitenSDK } from '../sdk.js';
+import type { KaitenSDK } from '../sdk';
 
 /**
  * MCP tool behavior hints, passed through verbatim to the SDK's

@@ -1,6 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Checklist, ChecklistItem } from '../kaiten/interfaces/card.js';
-import type { AccessGuard } from './guard.js';
+import type { Checklist, ChecklistItem, KaitenApi } from '../kaiten';
+import type { AccessGuard } from './guard';
 
 export class ChecklistService {
   constructor(

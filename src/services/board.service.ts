@@ -1,7 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { Board, Column, Lane, Space } from '../kaiten/interfaces/board.js';
-import type { KaitenConfig } from '../kaiten/interfaces/config.js';
-import type { AccessGuard } from './guard.js';
+import type { Board, Column, KaitenApi, KaitenConfig, Lane, Space } from '../kaiten';
+import type { AccessGuard } from './guard';
 
 export class BoardService {
   constructor(

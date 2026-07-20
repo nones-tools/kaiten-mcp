@@ -1,25 +1,25 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import { BlockersApi } from './blockers.js';
-import { BoardsApi } from './boards.js';
-import { CardsApi } from './cards.js';
-import { CommentsApi } from './comments.js';
-import { CompanyApi } from './company.js';
-import { FilesApi } from './files.js';
-import { LinksApi } from './links.js';
-import { SubtasksApi } from './subtasks.js';
-import { TimeLogsApi } from './timelogs.js';
-import { UsersApi } from './users.js';
+import type { HttpTransport } from '../interfaces';
+import { BlockersApi } from './blockers';
+import { BoardsApi } from './boards';
+import { CardsApi } from './cards';
+import { CommentsApi } from './comments';
+import { CompanyApi } from './company';
+import { FilesApi } from './files';
+import { LinksApi } from './links';
+import { SubtasksApi } from './subtasks';
+import { TimeLogsApi } from './timelogs';
+import { UsersApi } from './users';
 
-export { BlockersApi } from './blockers.js';
-export { BoardsApi } from './boards.js';
-export { CardsApi } from './cards.js';
-export { CommentsApi } from './comments.js';
-export { CompanyApi } from './company.js';
-export { FilesApi } from './files.js';
-export { LinksApi } from './links.js';
-export { SubtasksApi } from './subtasks.js';
-export { TimeLogsApi } from './timelogs.js';
-export { UsersApi } from './users.js';
+export { BlockersApi } from './blockers';
+export { BoardsApi } from './boards';
+export { CardsApi } from './cards';
+export { CommentsApi } from './comments';
+export { CompanyApi } from './company';
+export { FilesApi } from './files';
+export { LinksApi } from './links';
+export { SubtasksApi } from './subtasks';
+export { TimeLogsApi } from './timelogs';
+export { UsersApi } from './users';
 
 export class KaitenApi {
   readonly cards: CardsApi;

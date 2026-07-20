@@ -1,6 +1,5 @@
-import type { KaitenApi } from '../kaiten/api/index.js';
-import type { TimeLog } from '../kaiten/interfaces/timelog.js';
-import type { AccessGuard } from './guard.js';
+import type { KaitenApi, TimeLog } from '../kaiten';
+import type { AccessGuard } from './guard';
 
 export class TimeLogService {
   constructor(

@@ -1,6 +1,6 @@
-import type { CliCommand } from '../../interfaces/command.js';
-import type { Card } from '../../kaiten/interfaces/card.js';
-import { optimizeCardMinimalList } from '../projections.js';
+import type { CliCommand } from '../../interfaces';
+import type { Card } from '../../kaiten';
+import { optimizeCardMinimalList } from '../projections';
 
 export const tagCommand: CliCommand = {
   name: 'tag',

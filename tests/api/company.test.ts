@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { CompanyApi } from '../../src/kaiten/api/company.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { CompanyApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('CompanyApi', () => {
   it('getTags GETs /tags with no query params when none are given', async () => {

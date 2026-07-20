@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { TimeLogsApi } from '../../src/kaiten/api/timelogs.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { TimeLogsApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 
 describe('TimeLogsApi', () => {
   it('getTimeLogs GETs /cards/{id}/time-logs', async () => {

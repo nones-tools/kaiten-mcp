@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { CardsApi } from '../../src/kaiten/api/cards.js';
-import { createFakeFetch, makeClient } from './helpers.js';
+import { CardsApi } from '../../src/kaiten';
+import { createFakeFetch, makeClient } from './helpers';
 describe('CardsApi', () => {
   it('getCards without boardId hits /spaces/{id}/cards', async () => {
     const { fetchImpl, calls } = createFakeFetch([{ body: [] }]);

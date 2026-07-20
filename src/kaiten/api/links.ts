@@ -1,5 +1,4 @@
-import type { HttpTransport } from '../interfaces/http.js';
-import type { ExternalLink } from '../interfaces/link.js';
+import type { ExternalLink, HttpTransport } from '../interfaces';
 
 export class LinksApi {
   constructor(private readonly client: HttpTransport) {}

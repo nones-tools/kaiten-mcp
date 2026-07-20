@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import type { ToolContext, ToolHook } from '../src/interfaces/hook.js';
-import { KaitenApiError } from '../src/kaiten/http/errors.js';
-import { compose } from '../src/mcp/hooks/chain.js';
-import { errorHook } from '../src/mcp/hooks/error.hook.js';
-import { loggingHook } from '../src/mcp/hooks/logging.hook.js';
+import type { ToolContext, ToolHook } from '../src/interfaces';
+import { KaitenApiError } from '../src/kaiten';
+import { compose, errorHook, loggingHook } from '../src/mcp/hooks';
 
 function makeCtx(toolName = 'kaiten_test', args: unknown = {}): ToolContext {
   return { toolName, args };
