@@ -1,9 +1,9 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import type { Card, Checklist, ChecklistItem, Tag } from '../interfaces/card.js';
 import type { Column } from '../interfaces/board.js';
 
 export class CardsApi {
-  constructor(private readonly client: KaitenClient) {}
+  constructor(private readonly client: HttpTransport) {}
 
   getCards(spaceId: number, boardId?: number | null): Promise<Card[]> {
     let url = `/spaces/${spaceId}/cards`;

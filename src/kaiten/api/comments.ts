@@ -1,8 +1,8 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import type { Comment } from '../interfaces/comment.js';
 
 export class CommentsApi {
-  constructor(private readonly client: KaitenClient) {}
+  constructor(private readonly client: HttpTransport) {}
 
   getComments(cardId: number): Promise<Comment[]> {
     return this.client.get<Comment[]>(`/cards/${cardId}/comments`);

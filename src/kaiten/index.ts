@@ -19,6 +19,7 @@ export type {
   ChecklistItem,
   Column,
   Comment,
+  HttpTransport,
   KaitenConfig,
   Space,
   Tag,

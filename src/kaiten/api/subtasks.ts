@@ -1,8 +1,8 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import type { Card } from '../interfaces/card.js';
 
 export class SubtasksApi {
-  constructor(private readonly client: KaitenClient) {}
+  constructor(private readonly client: HttpTransport) {}
 
   getSubtasks(cardId: number): Promise<Card[]> {
     return this.client.get<Card[]>(`/cards/${cardId}/children`);

@@ -1,8 +1,8 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import type { User } from '../interfaces/user.js';
 
 export class UsersApi {
-  constructor(private readonly client: KaitenClient) {}
+  constructor(private readonly client: HttpTransport) {}
 
   getUsers(): Promise<User[]> {
     return this.client.get<User[]>('/users');

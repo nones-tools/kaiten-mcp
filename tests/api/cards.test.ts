@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { CardsApi } from '../../src/kaiten/api/cards.js';
 import { createFakeFetch, makeClient } from './helpers.js';
-
 describe('CardsApi', () => {
   it('getCards without boardId hits /spaces/{id}/cards', async () => {
     const { fetchImpl, calls } = createFakeFetch([{ body: [] }]);
@@ -112,8 +111,7 @@ describe('CardsApi', () => {
     await expect(api.moveCard(5, 999)).rejects.toThrow(
       'Column with ID 999 not found on board 1. Available columns on this board: 10 (To Do), 20 (Done)'
     );
-    // No PATCH should have been issued.
-    expect(calls.length).toBe(2);
+    expect(calls.length).toBe(2); // no PATCH should have been issued
   });
 
   it('moveCard wraps a card-not-found lookup failure', async () => {

@@ -1,17 +1,18 @@
-import type { KaitenSDK } from '../../sdk.js';
+import type { CliCommand } from '../../interfaces/command.js';
 
-type GetSdk = () => KaitenSDK;
-
-export async function subtaskCommand(args: string[], getSdk: GetSdk): Promise<void> {
-  const subTaskCmd = args[1];
-  if (subTaskCmd === 'create') {
-    const parentCardId = args[2];
-    const subtaskTitle = args[3];
-    const subtask = await getSdk().createSubtask(Number(parentCardId), subtaskTitle as string);
-    console.log(JSON.stringify(subtask, null, 2));
-  } else if (subTaskCmd === 'list') {
-    const parentCardId = args[2];
-    const subtasks = await getSdk().getSubtasks(Number(parentCardId));
-    console.log(JSON.stringify(subtasks, null, 2));
-  }
-}
+export const subtaskCommand: CliCommand = {
+  name: 'subtask',
+  async run(argv, { getSdk }) {
+    const subTaskCmd = argv[1];
+    if (subTaskCmd === 'create') {
+      const parentCardId = argv[2];
+      const subtaskTitle = argv[3];
+      const subtask = await getSdk().createSubtask(Number(parentCardId), subtaskTitle as string);
+      console.log(JSON.stringify(subtask, null, 2));
+    } else if (subTaskCmd === 'list') {
+      const parentCardId = argv[2];
+      const subtasks = await getSdk().getSubtasks(Number(parentCardId));
+      console.log(JSON.stringify(subtasks, null, 2));
+    }
+  },
+};

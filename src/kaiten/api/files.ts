@@ -1,8 +1,8 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import type { CardFile } from '../interfaces/card.js';
 
 export class FilesApi {
-  constructor(private readonly client: KaitenClient) {}
+  constructor(private readonly client: HttpTransport) {}
 
   getCardFiles(cardId: number): Promise<CardFile[]> {
     return this.client.get<CardFile[]>(`/cards/${cardId}/files`);

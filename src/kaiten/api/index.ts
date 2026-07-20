@@ -1,4 +1,4 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import { BoardsApi } from './boards.js';
 import { CardsApi } from './cards.js';
 import { CommentsApi } from './comments.js';
@@ -21,7 +21,7 @@ export class KaitenApi {
   readonly subtasks: SubtasksApi;
   readonly users: UsersApi;
 
-  constructor(client: KaitenClient) {
+  constructor(client: HttpTransport) {
     this.cards = new CardsApi(client);
     this.boards = new BoardsApi(client);
     this.comments = new CommentsApi(client);

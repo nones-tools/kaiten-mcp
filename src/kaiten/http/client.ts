@@ -1,3 +1,4 @@
+import type { HttpTransport, QueryParams } from '../interfaces/http.js';
 import { KaitenApiError } from './errors.js';
 
 export interface KaitenClientOptions {
@@ -6,9 +7,10 @@ export interface KaitenClientOptions {
   fetchImpl?: typeof fetch;
 }
 
-export type QueryParams = Record<string, string | number | boolean | undefined>;
+export type { QueryParams } from '../interfaces/http.js';
 
-export class KaitenClient {
+/** Adapts native `fetch` to the `HttpTransport` contract the API layer uses. */
+export class KaitenClient implements HttpTransport {
   private readonly apiUrl: string;
   private readonly apiToken: string;
   private readonly fetchImpl: typeof fetch;

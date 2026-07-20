@@ -1,8 +1,8 @@
-import type { KaitenClient } from '../http/client.js';
+import type { HttpTransport } from '../interfaces/http.js';
 import type { Board, Column, Space } from '../interfaces/board.js';
 
 export class BoardsApi {
-  constructor(private readonly client: KaitenClient) {}
+  constructor(private readonly client: HttpTransport) {}
 
   getSpaces(): Promise<Space[]> {
     return this.client.get<Space[]>('/spaces');
