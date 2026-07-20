@@ -1,51 +1,55 @@
-# Agent Instructions
+# AGENTS.md — kaiten-mcp for AI agents
 
-This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
+MCP server (39 tools) + CLI + typed SDK for the Kaiten API. Package: `@nones/kaiten-mcp`.
+Read `specs/000-project/spec.md` for the domain model and `.specify/memory/constitution.md`
+for the non-negotiable rules before making structural changes.
 
-> **Architecture in one line:** Issues live in a local Dolt database
-> (`.beads/dolt/`); cross-machine sync uses `bd dolt push/pull` (a
-> git-compatible protocol), stored under `refs/dolt/data` on your git
-> remote — separate from `refs/heads/*` where your code lives.
-> `.beads/issues.jsonl` is a passive export, not the wire protocol.
->
-> See [SYNC_CONCEPTS.md](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md)
-> for the one-screen overview and anti-patterns (don't treat JSONL as the
-> source of truth; don't `bd import` during normal operation; don't
-> reach for third-party Dolt hosting before trying the default).
-
-## Quick Reference
+## Commands
 
 ```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
+bun install          # deps
+bun test             # full suite — no network/credentials needed; must stay green
+bunx tsc --noEmit    # strict typecheck; must stay clean
+bun run dev          # MCP server, watch mode
+bun run dev:cli      # CLI from sources
+bun run build        # bundle to dist/ (Node target) + emit .d.ts
+bun run pack         # build + npm tarball (bun pm pack)
 ```
 
-## Non-Interactive Shell Commands
+## Map
 
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
+| Path | What lives there | Rule |
+| --- | --- | --- |
+| `src/kaiten/` | **Kaiten Core**: `interfaces/` (entity types), `http/` (fetch client + errors), `api/` (resource classes), `config.ts` | Self-contained: never import from outside `src/kaiten/`. Future standalone package `@nones/kaiten-core` (beads epic `kaiten-mcp-jtg`) |
+| `src/services/` | Business logic: `AccessGuard` (space/board allowlists), projections, domain services | Depends only on the core |
+| `src/sdk.ts` | `KaitenSDK` facade — public API of the package | Adapters call this, never raw HTTP |
+| `src/interfaces/` | App contracts: `ToolDef`, `CliCommand`, `ToolHook` | Types only |
+| `src/mcp/` | MCP adapter: `tools/` by domain, `hooks/` middleware chain, `server.ts` entry | Tool names/schemas are frozen contracts |
+| `src/cli/` | CLI adapter: `commands/`, `projections.ts`, `help.ts`, `index.ts` entry | Output format is a frozen contract |
+| `src/lib/` | git + temp-dir helpers | |
+| `tests/` | bun:test, mocked transport, no network | |
+| `docs/` | human documentation (configuration, tools, cli, sdk, architecture, development) | Keep in sync with code |
+| `specs/`, `.specify/` | Spec Kit artifacts and workflow | New features: `/speckit-specify` → plan → tasks |
 
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
+## Hard rules
 
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
+- **≤ 200 lines per source file.** Split by domain, re-export via the layer's `index.ts`.
+- **stdout is the MCP protocol.** Diagnostics → stderr only.
+- **Behavior is contract.** 39 tool names/schemas/defaults, CLI output, root exports —
+  don't change them in a refactor; breaking changes need a major version bump.
+- **Tests gate every change**: `bun test` + `bunx tsc --noEmit` green before done.
+- Runtime deps are frozen to `@modelcontextprotocol/sdk` + `zod` (constitution).
+- Non-interactive shell flags only (`rm -f`, `cp -f`, `mv -f`, …) — some systems alias
+  these to `-i` and an agent will hang on the prompt.
 
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
+## Configuration the code needs at runtime
 
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
+`KAITEN_API_URL` and `KAITEN_API_TOKEN` are required; without them `loadConfig()` throws
+an actionable error — **relay it to the user verbatim**, it explains where to set the
+variables (MCP client `env` block, `./.kaiten.env`, `./.env`, or `~/.kaiten/config`).
+Optional: `KAITEN_DEFAULT_SPACE_ID`, `KAITEN_DEFAULT_BOARD_ID`, `KAITEN_ALLOWED_SPACE_IDS`,
+`KAITEN_ALLOWED_BOARD_IDS`, `KAITEN_LOG_LEVEL`, `KAITEN_TEMP_DIR`. Details:
+`docs/configuration.md`. Tests never need real credentials.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker
@@ -66,63 +70,7 @@ bd close <id>         # Complete work
 - Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
 - Run `bd prime` for detailed command reference and session close protocol
 - Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
-**Architecture in one line:** issues live in a local Dolt DB; sync uses `refs/dolt/data` on your git remote; `.beads/issues.jsonl` is a passive export. See https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md for details and anti-patterns.
-
-## Agent Context Profiles
-
-The managed Beads block is task-tracking guidance, not permission to override repository, user, or orchestrator instructions.
-
-- **Conservative (default)**: Use `bd` for task tracking. Do not run git commits, git pushes, or Dolt remote sync unless explicitly asked. At handoff, report changed files, validation, and suggested next commands.
-- **Minimal**: Keep tool instruction files as pointers to `bd prime`; use the same conservative git policy unless active instructions say otherwise.
-- **Team-maintainer**: Only when the repository explicitly opts in, agents may close beads, run quality gates, commit, and push as part of session close. A current "do not commit" or "do not push" instruction still wins.
-
-## Session Completion
-
-This protocol applies when ending a Beads implementation workflow. It is subordinate to explicit user, repository, and orchestrator instructions.
-
-1. **File issues for remaining work** - Create beads for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **Handle git/sync by active profile**:
-   ```bash
-   # Conservative/minimal/default: report status and proposed commands; wait for approval.
-   git status
-
-   # Team-maintainer opt-in only, unless current instructions forbid it:
-   git pull --rebase
-   bd dolt push
-   git push
-   git status
-   ```
-5. **Hand off** - Summarize changes, validation, issue status, and any blocked sync/commit/push step
-
-**Critical rules:**
-- Explicit user or orchestrator instructions override this Beads block.
-- Do not commit or push without clear authority from the active profile or the current user request.
-- If a required sync or push is blocked, stop and report the exact command and error.
 <!-- END BEADS INTEGRATION -->
 
-<!-- BEGIN BEADS CODEX SETUP: generated by bd setup codex -->
-## Beads Issue Tracker
-
-Use Beads (`bd`) for durable task tracking in repositories that include it. Use the `beads` skill at `.agents/skills/beads/SKILL.md` (project install) or `~/.agents/skills/beads/SKILL.md` (global install) for Beads workflow guidance, then use the `bd` CLI for issue operations.
-
-### Quick Reference
-
-```bash
-bd ready                # Find available work
-bd show <id>            # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>           # Complete work
-bd prime                # Refresh Beads context
-```
-
-### Rules
-
-- Use `bd` for all task tracking; do not create markdown TODO lists.
-- Run `bd prime` when Beads context is missing or stale. Codex 0.129.0+ can load Beads context automatically through native hooks; use `/hooks` to inspect or toggle them.
-- Keep persistent project memory in Beads via `bd remember`; do not create ad hoc memory files.
-
-**Architecture in one line:** issues live in a local Dolt DB; sync uses `refs/dolt/data` on your git remote; `.beads/issues.jsonl` is a passive export. See https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md for details and anti-patterns.
-<!-- END BEADS CODEX SETUP -->
+Also: create a bd issue for any discovered-but-deferred work; close issues in the change
+that resolves them and mention the id (e.g. `kaiten-mcp-c9h`) in the commit message.
