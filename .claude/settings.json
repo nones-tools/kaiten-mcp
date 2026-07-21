@@ -10,6 +10,18 @@
         ],
         "matcher": ""
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/docs-sync-reminder.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

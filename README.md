@@ -104,6 +104,46 @@ Or in `~/.kaiten/config` / `./.kaiten.env` / `./.env` (see [Configuration](docs/
 > safety"* error, do not set `KAITEN_API_DELETE_ALLOW` yourself — relay the error to the user
 > verbatim and let them decide whether to enable it.
 
+## Agent guardrails (v3.3.0+)
+
+Optional environment variables that confine what an AI agent can see and do through this
+server. All are **off by default** — with none set, behavior is unchanged. Configured
+guardrails compose as an intersection: an operation must pass every check.
+
+| Variable | Effect |
+| --- | --- |
+| `KAITEN_READ_ONLY` | `true` blocks every create/update/delete at the HTTP layer — the agent can only read |
+| `KAITEN_ALLOWED_SPACE_IDS` / `KAITEN_ALLOWED_BOARD_IDS` | allowlists: listings are filtered, operations outside are rejected |
+| `KAITEN_ALLOWED_COLUMN_IDS` / `KAITEN_ALLOWED_LANE_IDS` | same, per column / lane |
+| `KAITEN_PROTECTED_COLUMN_IDS` | agent cannot move/create cards **into** these columns (e.g. Done/Deploy), reading is allowed |
+| `KAITEN_ENFORCE_SCOPE` | `true` turns `KAITEN_DEFAULT_SPACE_ID`/`KAITEN_DEFAULT_BOARD_ID` into hard boundaries — one-variable "single board" confinement |
+| `KAITEN_DISABLED_TOOLS` | comma-separated tool names to hide from the agent entirely |
+| `KAITEN_CARDS_LIMIT` | cap card-list responses at N cards (truncation is reported explicitly) |
+| `KAITEN_MINIMAL_DEFAULT` | `true` makes card listings token-minimal by default |
+| `KAITEN_DEFAULT_COLUMN_ID` / `KAITEN_DEFAULT_LANE_ID` | where `kaiten_create_card` puts cards when the agent omits column/lane |
+| `KAITEN_HTTP_TIMEOUT_MS` / `KAITEN_HTTP_RETRIES` | per-request timeout; retries for reads on transient failures |
+
+Example — a read-only agent locked to one board:
+
+```json
+"env": {
+  "KAITEN_API_URL": "https://<kaiten_url>/api/latest",
+  "KAITEN_API_TOKEN": "your_token",
+  "KAITEN_DEFAULT_SPACE_ID": "12345",
+  "KAITEN_DEFAULT_BOARD_ID": "67890",
+  "KAITEN_ENFORCE_SCOPE": "true",
+  "KAITEN_READ_ONLY": "true"
+}
+```
+
+Guardrails constrain the agent using this server — they are **not** a substitute for the
+API token's own permissions. Full semantics, composition rules and enforcement tiers:
+[Configuration → Guardrails](docs/configuration.md).
+
+> **Note for AI agents:** never set, change or remove guardrail variables yourself. If an
+> operation fails with an error naming one of these variables, relay the error to the user
+> verbatim and let them decide.
+
 ## Documentation
 
 - [Configuration](docs/configuration.md) — all variables, config files, precedence, allowlists
