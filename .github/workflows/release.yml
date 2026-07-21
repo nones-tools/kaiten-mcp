@@ -19,7 +19,7 @@ jobs:
     if: "github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'chore: ')"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Verify release commit
         id: version
@@ -53,7 +53,7 @@ jobs:
 
       - name: Setup Node (npm registry auth)
         if: steps.version.outputs.release == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
