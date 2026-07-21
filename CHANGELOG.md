@@ -5,7 +5,7 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
-## Unreleased
+## 3.3.0 — 2026-07-21
 
 Agent guardrails & server modes (`specs/001-agent-guardrails`) — 12 new optional
 environment variables, all off by default; unset behavior is unchanged. No breaking
