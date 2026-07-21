@@ -45,6 +45,12 @@ existing parameter, making an optional parameter required, or changing an existi
 requires a major version bump. Tests must encode this distinction explicitly (e.g. a frozen
 ordered list for the pre-existing contract, separate assertions for additive tools).
 
+The parameter freeze is directional: it forbids **tightening** an existing parameter
+(optional → required, a type change, or removal). **Relaxing** a parameter from required to
+optional is additive and allowed in a minor version, provided every previously valid call
+behaves identically afterward (the old caller's explicit argument still takes the same
+effect; only a new, previously-invalid omission becomes possible).
+
 ### V. Protocol Hygiene & Token Economy
 stdout belongs to the MCP protocol — all diagnostics go to **stderr**. Tool and CLI
 responses offer token-optimized shapes (`minimal`/`simple` flags, short-key projections);
@@ -69,8 +75,14 @@ the change that motivates them and must keep `AGENTS.md` and `docs/architecture.
 consistent. Semantic versioning applies to the npm package; breaking any Principle-IV
 contract requires a major version bump.
 
-**Version**: 1.2.0 | **Ratified**: 2026-07-20 | **Last Amended**: 2026-07-20
+**Version**: 1.3.0 | **Ratified**: 2026-07-20 | **Last Amended**: 2026-07-21
 
 **1.2.0 amendment**: added `inversify` + `reflect-metadata` as frozen runtime
 dependencies for the `src/di/` composition root (NestJS/Angular-style DI). `src/kaiten/`
 remains undecorated and framework-free — Core classes are bound via factory bindings.
+
+**1.3.0 amendment**: clarified Principle IV's parameter freeze as directional — tightening
+(optional→required, type change, removal) requires a major version bump; relaxing
+required→optional where every previously valid call behaves identically is additive and
+allowed in a minor version. Motivated by `kaiten_create_card`'s `columnId` becoming optional
+(falls back to `KAITEN_DEFAULT_COLUMN_ID`) in `specs/001-agent-guardrails` (v3.4.0).

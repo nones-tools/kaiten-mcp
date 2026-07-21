@@ -6,10 +6,11 @@ import { fileURLToPath } from 'url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import type { ToolContext } from '../interfaces';
+import { loadConfigLenient } from '../kaiten';
 import { KaitenSDK } from '../sdk';
 import { compose, errorHook, loggingHook } from './hooks';
 import { errorLog, logLevel } from './logger';
-import { tools } from './tools';
+import { filterTools, tools } from './tools';
 
 /**
  * Version comes from package.json at runtime (not a hardcoded literal) so
@@ -42,9 +43,21 @@ function getSdk(): KaitenSDK {
 
 const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
 
+// `loadConfigLenient()` never throws on missing credentials - `tools/list`
+// must work before `KAITEN_API_URL`/`KAITEN_API_TOKEN` are configured, so
+// this can't reuse the credential-requiring `loadConfig()` the SDK uses
+// internally. Only `disabledTools` is read here (US5, specs/001-agent-guardrails).
+const { disabledTools } = loadConfigLenient();
+const { kept: registeredTools, unknown: unknownDisabledTools } = filterTools(tools, disabledTools);
+if (unknownDisabledTools.length > 0) {
+  console.error(
+    `KAITEN_DISABLED_TOOLS names no known tool (ignored): ${unknownDisabledTools.join(', ')}`
+  );
+}
+
 // Every tool call runs through the middleware chain: logging wraps error
 // formatting wraps the terminal handler (chain of responsibility).
-for (const tool of tools) {
+for (const tool of registeredTools) {
   const runTool = compose([loggingHook, errorHook], async (ctx) => {
     const result = await tool.handler(getSdk(), ctx.args ?? {});
     ctx.response = {

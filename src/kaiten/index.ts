@@ -14,8 +14,8 @@ export {
   TimeLogsApi,
   UsersApi,
 } from './api';
-export { loadConfig, parseEnvFile } from './config';
-export { KaitenApiError, KaitenClient, KaitenDeleteDisabledError } from './http';
+export { loadConfig, loadConfigLenient, parseEnvFile } from './config';
+export { KaitenApiError, KaitenClient, KaitenDeleteDisabledError, KaitenReadOnlyError, KaitenTimeoutError } from './http';
 export type { KaitenClientOptions, QueryParams } from './http';
 export type {
   Board,

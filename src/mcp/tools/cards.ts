@@ -1,11 +1,14 @@
 import { z } from 'zod';
 import type { Card } from '../../kaiten';
 import type { ToolDef } from '../../interfaces';
+import { applyCardsLimit } from './limit';
 
 export const cardTools: ToolDef[] = [
   {
     name: 'kaiten_cards',
-    description: 'Get list of cards (optimized format)',
+    description:
+      'Get list of cards (optimized format). May return a truncated-list wrapper ' +
+      '({ truncated, total, returned, note, cards }) instead of a plain array when KAITEN_CARDS_LIMIT is set and exceeded.',
     annotations: { readOnlyHint: true },
     inputSchema: {
       spaceId: z.number().optional().describe('Space ID (optional, uses default if not specified)'),
@@ -13,9 +16,14 @@ export const cardTools: ToolDef[] = [
       minimal: z
         .boolean()
         .optional()
-        .describe('Return minimal JSON format (token optimized). Default false (full payload).'),
+        .describe('Return minimal JSON format (token optimized). Default false (full payload), or KAITEN_MINIMAL_DEFAULT.'),
     },
-    handler: async (sdk, args) => sdk.getCards(args.spaceId ?? null, args.boardId ?? null, args.minimal === true),
+    handler: async (sdk, args) => {
+      const explicitMinimal = args.minimal === true ? true : args.minimal === false ? false : undefined;
+      const minimal = explicitMinimal ?? sdk.config?.minimalDefault ?? false;
+      const result = await sdk.getCards(args.spaceId ?? null, args.boardId ?? null, minimal);
+      return applyCardsLimit(result, sdk.config?.cardsLimit ?? null);
+    },
   },
   {
     name: 'kaiten_card',
@@ -37,13 +45,18 @@ export const cardTools: ToolDef[] = [
     inputSchema: {
       title: z.string().describe('Card title - for an independent task on a board'),
       boardId: z.number().describe('Board ID where to create the independent card'),
-      columnId: z.number().describe('Column ID where to place the independent card'),
+      columnId: z
+        .number()
+        .optional()
+        .describe(
+          'Column ID where to place the independent card. Optional if KAITEN_DEFAULT_COLUMN_ID is configured server-side; otherwise required.'
+        ),
       description: z.string().optional().describe('Card description (optional)'),
       laneId: z
         .number()
         .optional()
         .describe(
-          'Lane ID внутри доски. Опционально, но рекомендуется указывать: иначе карточка попадёт на дефолтную lane доски. Список lanes доски — kaiten_lanes.'
+          'Lane ID внутри доски. Опционально, но рекомендуется указывать: иначе карточка попадёт на дефолтную lane доски (или на KAITEN_DEFAULT_LANE_ID, если он настроен). Список lanes доски — kaiten_lanes.'
         ),
       tags: z.array(z.string()).optional().describe('Tag names to attach to the new card (optional)'),
       size: z.number().optional().describe('Card size/estimate (optional)'),
@@ -144,7 +157,10 @@ export const cardTools: ToolDef[] = [
   },
   {
     name: 'kaiten_find_cards',
-    description: 'Find cards by tag (token optimized - returns only id, title, board_id, column_id, tags)',
+    description:
+      'Find cards by tag (token optimized - returns only id, title, board_id, column_id, tags). May return a ' +
+      'truncated-list wrapper ({ truncated, total, returned, note, cards }) instead of a plain array when ' +
+      'KAITEN_CARDS_LIMIT is set and exceeded.',
     annotations: { readOnlyHint: true },
     inputSchema: {
       tagName: z.string().describe('Tag name to filter by'),
@@ -153,46 +169,18 @@ export const cardTools: ToolDef[] = [
     handler: async (sdk, args) => {
       const findCards = (await sdk.getCards(null, args.boardId ?? null)) as Card[];
       const findFiltered = findCards.filter((c) => c.tags?.some((t) => t.name === args.tagName));
-      return findFiltered.map((c) => ({
+      const projected = findFiltered.map((c) => ({
         id: c.id,
         title: c.title,
         board_id: c.board_id,
         column_id: c.column_id,
         tags: c.tags,
       }));
+      return applyCardsLimit(projected, sdk.config?.cardsLimit ?? null);
     },
   },
 ];
 
-/**
- * 3.1.0 additive card tools - closing gaps against SDK methods that already
- * existed but had no MCP tool wrapper. Appended after the legacy `cardTools`
- * sequence in tools/index.ts; never interleaved with it.
- */
-export const newCardTools: ToolDef[] = [
-  {
-    name: 'kaiten_archive_card',
-    description: 'Archive a card (sets condition to archived)',
-    inputSchema: {
-      cardId: z.number().describe('Card ID'),
-    },
-    handler: async (sdk, args) => sdk.archive(args.cardId),
-  },
-  {
-    name: 'kaiten_unarchive_card',
-    description: 'Unarchive a card (sets condition back to active)',
-    inputSchema: {
-      cardId: z.number().describe('Card ID'),
-    },
-    handler: async (sdk, args) => sdk.unarchive(args.cardId),
-  },
-  {
-    name: 'kaiten_unassign_card',
-    description: 'Remove a user assignment from a card',
-    inputSchema: {
-      cardId: z.number().describe('Card ID'),
-      userId: z.number().describe('User ID to unassign'),
-    },
-    handler: async (sdk, args) => sdk.unassignFrom(args.cardId, args.userId),
-  },
-];
+// `newCardTools` (3.1.0 additive tools) moved to ./cards-additive.ts to keep
+// this file under the 200-line limit; re-exported unchanged via tools/index.ts.
+export { newCardTools } from './cards-additive';

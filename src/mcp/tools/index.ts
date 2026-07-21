@@ -53,3 +53,25 @@ export const tools: ToolDef[] = [
   ...linkTools,
   ...newFileTools,
 ];
+
+/**
+ * US5 (specs/001-agent-guardrails): `KAITEN_DISABLED_TOOLS` hides tools from
+ * registration entirely (attack surface + context window). Pure function so
+ * it's testable without spinning up the MCP server - `server.ts` is the only
+ * caller. Survivors keep the registry's relative order (a plain `.filter`
+ * already guarantees that); names in `disabledNames` that match no tool are
+ * reported back so the caller can warn without silently ignoring a typo.
+ */
+export function filterTools(
+  allTools: ToolDef[],
+  disabledNames: string[] | null | undefined
+): { kept: ToolDef[]; unknown: string[] } {
+  if (!disabledNames || disabledNames.length === 0) {
+    return { kept: allTools, unknown: [] };
+  }
+  const disabled = new Set(disabledNames);
+  const known = new Set(allTools.map((t) => t.name));
+  const kept = allTools.filter((t) => !disabled.has(t.name));
+  const unknown = disabledNames.filter((name) => !known.has(name));
+  return { kept, unknown };
+}

@@ -48,7 +48,14 @@ export function buildContainer(overrides: ContainerOverrides = {}): Container {
     .toDynamicValue((ctx) => {
       if (client) return client;
       const config = ctx.get(TOKENS.Config);
-      return new KaitenClient({ apiUrl: config.apiUrl, apiToken: config.apiToken, allowDelete: config.deleteAllow });
+      return new KaitenClient({
+        apiUrl: config.apiUrl,
+        apiToken: config.apiToken,
+        allowDelete: config.deleteAllow,
+        readOnly: config.readOnly,
+        timeoutMs: config.httpTimeoutMs,
+        retries: config.httpRetries,
+      });
     })
     .inSingletonScope();
 

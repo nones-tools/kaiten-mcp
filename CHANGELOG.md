@@ -5,6 +5,45 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+Agent guardrails & server modes (`specs/001-agent-guardrails`) — 12 new optional
+environment variables, all off by default; unset behavior is unchanged. No breaking
+changes.
+
+### Added
+
+- **Scope**: `KAITEN_ALLOWED_COLUMN_IDS` / `KAITEN_ALLOWED_LANE_IDS` filter card listings
+  and reject writes targeting a disallowed column/lane; `KAITEN_PROTECTED_COLUMN_IDS` bans
+  write-targeting specific columns while leaving reads and existing cards there untouched;
+  `KAITEN_ENFORCE_SCOPE` turns `KAITEN_DEFAULT_SPACE_ID`/`KAITEN_DEFAULT_BOARD_ID` into hard
+  boundaries that reject any explicit id outside them.
+- **Modes**: `KAITEN_READ_ONLY` blocks every POST/PATCH/PUT/DELETE at the HTTP client with
+  `KaitenReadOnlyError`, overriding `KAITEN_API_DELETE_ALLOW`; `KAITEN_DISABLED_TOOLS` hides
+  named tools from MCP registration; `KAITEN_CARDS_LIMIT` caps `kaiten_cards` /
+  `kaiten_find_cards` to N results, wrapping truncated responses in
+  `{ truncated, total, returned, note, cards }`; `KAITEN_MINIMAL_DEFAULT` makes
+  `kaiten_cards` default to the minimal projection (explicit `minimal` still wins).
+- **Defaults & network**: `KAITEN_DEFAULT_COLUMN_ID` / `KAITEN_DEFAULT_LANE_ID` supply the
+  column/lane for card creation when omitted (explicit argument wins; error naming both
+  remedies when neither is available); `KAITEN_HTTP_TIMEOUT_MS` aborts a slow request with
+  `KaitenTimeoutError`; `KAITEN_HTTP_RETRIES` retries GET requests only, on network errors
+  or HTTP >= 500 (writes are never retried).
+- New root exports: `loadConfigLenient()` (same merge/parse as `loadConfig`, never throws
+  on missing credentials), `KaitenReadOnlyError`, `KaitenTimeoutError`. `KaitenClientOptions`
+  gains optional `readOnly`, `timeoutMs`, `retries`.
+- `kaiten_create_card`'s `columnId` is now optional (falls back to
+  `KAITEN_DEFAULT_COLUMN_ID`) — an additive relaxation per constitution 1.3.0; every
+  previously valid call behaves identically.
+
+### Fixed
+
+- `KAITEN_ALLOWED_BOARD_IDS` now also filters space-wide card listings (`kaiten_cards` with
+  no `boardId`, `kaiten_find_cards`, tag-based listings) — previously these leaked cards
+  from every board in the space regardless of the allowlist.
+- `KAITEN_DEFAULT_BOARD_ID` now scopes `kaiten_cards` to that board when no explicit
+  `boardId` is passed — previously it was ignored by card listing.
+
 ## 3.2.3 — 2026-07-20
 
 _No changelog entries — see commit history._

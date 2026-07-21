@@ -64,9 +64,15 @@ variables (MCP client `env` block, `./.kaiten.env`, `./.env`, or `~/.kaiten/conf
 Optional: `KAITEN_DEFAULT_SPACE_ID`, `KAITEN_DEFAULT_BOARD_ID`, `KAITEN_ALLOWED_SPACE_IDS`,
 `KAITEN_ALLOWED_BOARD_IDS`, `KAITEN_LOG_LEVEL`, `KAITEN_TEMP_DIR`. Details:
 `docs/configuration.md`. Tests never need real credentials.
-All HTTP DELETE calls are disabled unless `KAITEN_API_DELETE_ALLOW=true` — agents must never
-set this variable themselves; relay the `KaitenDeleteDisabledError` message to the user verbatim
-and let them decide.
+Also optional (guardrails, specs/001-agent-guardrails): `KAITEN_ALLOWED_COLUMN_IDS`,
+`KAITEN_ALLOWED_LANE_IDS`, `KAITEN_PROTECTED_COLUMN_IDS`, `KAITEN_ENFORCE_SCOPE`,
+`KAITEN_READ_ONLY`, `KAITEN_DISABLED_TOOLS`, `KAITEN_CARDS_LIMIT`, `KAITEN_MINIMAL_DEFAULT`,
+`KAITEN_DEFAULT_COLUMN_ID`, `KAITEN_DEFAULT_LANE_ID`, `KAITEN_HTTP_TIMEOUT_MS`,
+`KAITEN_HTTP_RETRIES` — see `docs/configuration.md#guardrails`.
+All HTTP DELETE calls are disabled unless `KAITEN_API_DELETE_ALLOW=true`, and all writes are
+blocked when `KAITEN_READ_ONLY=true` — agents must never set or change these, or any other
+guardrail variable, themselves; relay the rejection error (`KaitenDeleteDisabledError`,
+`KaitenReadOnlyError`, or a guardrail's own message) to the user verbatim and let them decide.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker

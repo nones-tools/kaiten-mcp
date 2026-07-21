@@ -30,7 +30,12 @@ const OLD_TOOLS: { name: string; required: string[] }[] = [
   { name: 'kaiten_columns', required: ['boardId'] },
   { name: 'kaiten_cards', required: [] },
   { name: 'kaiten_card', required: ['cardId'] },
-  { name: 'kaiten_create_card', required: ['title', 'boardId', 'columnId'] },
+  // 3.4.0: `columnId` required -> optional (specs/001-agent-guardrails US7,
+  // KAITEN_DEFAULT_COLUMN_ID). Intentional relaxation, not a drift - every
+  // previously valid call (always passing columnId) behaves identically;
+  // constitution 1.3.0 amendment clarifies the required-ness freeze forbids
+  // tightening only, not required->optional relaxations like this one.
+  { name: 'kaiten_create_card', required: ['title', 'boardId'] },
   { name: 'kaiten_update_card', required: ['cardId'] },
   { name: 'kaiten_delete_card', required: ['cardId'] },
   { name: 'kaiten_move_card', required: ['cardId', 'columnId'] },

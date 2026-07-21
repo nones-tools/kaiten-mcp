@@ -22,9 +22,9 @@ Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALL
 
 | Tool | Params | Notes |
 | --- | --- | --- |
-| `kaiten_cards` | `spaceId?`, `boardId?`, `minimal?` | `minimal: true` → token-optimized projection. Read-only. |
+| `kaiten_cards` | `spaceId?`, `boardId?`, `minimal?` | `minimal: true` → token-optimized projection, or defaults to minimal when `KAITEN_MINIMAL_DEFAULT=true` (explicit `minimal` still wins). Filtered by `KAITEN_ALLOWED_BOARD_IDS`/`KAITEN_ALLOWED_COLUMN_IDS`/`KAITEN_ALLOWED_LANE_IDS` when set; scoped to `KAITEN_DEFAULT_BOARD_ID` when no `boardId` is passed. May return a truncated-list wrapper (`{ truncated, total, returned, note, cards }`) instead of a plain array when `KAITEN_CARDS_LIMIT` is set and exceeded. Read-only. |
 | `kaiten_card` | `cardId`, `simple?` | `simple` defaults to **true** (compact); pass `false` for the full payload. Read-only. |
-| `kaiten_create_card` | `title`, `boardId`, `columnId`, `description?`, `laneId?`, `tags?`, `size?`, `plannedStart?`, `plannedEnd?`, `typeId?` | Specify `laneId` when known (discover via `kaiten_lanes`) — otherwise the card lands on the board's default lane. `typeId` discoverable via `kaiten_card_types`. |
+| `kaiten_create_card` | `title`, `boardId`, `columnId?`, `description?`, `laneId?`, `tags?`, `size?`, `plannedStart?`, `plannedEnd?`, `typeId?` | `columnId` is optional when `KAITEN_DEFAULT_COLUMN_ID` is configured server-side (3.4.0 relaxation — explicit argument always wins; an actionable error is thrown if neither is set); otherwise required. Specify `laneId` when known (discover via `kaiten_lanes`) — otherwise the card lands on `KAITEN_DEFAULT_LANE_ID` if configured, else the board's default lane. `typeId` discoverable via `kaiten_card_types`. |
 | `kaiten_update_card` | `cardId`, plus optional structured fields: `title`, `description`, `columnId`, `laneId`, `boardId`, `size`, `plannedStart`, `plannedEnd`, `dueDate`, `asap`, `condition`; legacy `data?` | Prefer the structured fields. `data` (JSON **string**) is **deprecated**, kept only for raw Kaiten fields not yet modeled — explicit structured fields win over the same key in `data`. At least one field is required. |
 | `kaiten_delete_card` | `cardId` | Destructive. Requires `KAITEN_API_DELETE_ALLOW=true`. |
 | `kaiten_move_card` | `cardId`, `columnId`, `laneId?` | Validates the column belongs to the card's board; error lists available columns. `laneId` discoverable via `kaiten_lanes`. |
@@ -32,7 +32,7 @@ Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALL
 | `kaiten_unassign_card` | `cardId`, `userId` | Remove a user assignment |
 | `kaiten_archive_card` | `cardId` | Sets `condition` to archived |
 | `kaiten_unarchive_card` | `cardId` | Sets `condition` back to active |
-| `kaiten_find_cards` | `tagName`, `boardId?` | Returns only `id`, `title`, `board_id`, `column_id`, `tags`. Read-only. |
+| `kaiten_find_cards` | `tagName`, `boardId?` | Returns only `id`, `title`, `board_id`, `column_id`, `tags`. Filtered by `KAITEN_ALLOWED_BOARD_IDS` when set. May return the same truncated-list wrapper as `kaiten_cards` when `KAITEN_CARDS_LIMIT` is set and exceeded. Read-only. |
 
 ## Card hierarchy
 
