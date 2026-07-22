@@ -5,7 +5,7 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
-## Unreleased
+## 4.1.0 — 2026-07-22
 
 Card listings became usable on large boards (kaiten-mcp-3mh): sensible defaults
 (active cards, newest first) and automatic pagination past the server's 100-card page cap.
