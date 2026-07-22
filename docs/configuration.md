@@ -71,7 +71,7 @@ of the space/board allowlists above. They apply in three enforcement tiers:
   `KAITEN_ALLOWED_LANE_IDS` / `KAITEN_PROTECTED_COLUMN_IDS` / `KAITEN_ENFORCE_SCOPE` /
   `KAITEN_DEFAULT_COLUMN_ID` / `KAITEN_DEFAULT_LANE_ID`. Enforced in business logic, so the
   CLI and SDK get the same protection as the MCP tools.
-- **MCP adapter** (`src/mcp/server.ts`, `src/mcp/tools/`) — `KAITEN_DISABLED_TOOLS`,
+- **MCP adapter** (`src/mcp/bootstrap.ts`, `src/mcp/tools/`) — `KAITEN_DISABLED_TOOLS`,
   `KAITEN_CARDS_LIMIT`, `KAITEN_MINIMAL_DEFAULT`. Shapes the tool surface and response size
   for MCP clients only; the SDK/CLI are unaffected.
 

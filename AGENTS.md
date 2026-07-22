@@ -32,7 +32,7 @@ Releases are CI-driven: only a `chore: X.Y.Z` commit on master triggers
 | `src/di/` | Composition root: `tokens.ts` (typed `TOKENS` symbols), `container.ts` (`buildContainer()`, NestJS/Angular-style), barrel | Core classes bound via factory (`toDynamicValue`); app services bound `.to(Class)` |
 | `src/sdk.ts` | `KaitenSDK` facade — public API of the package | Adapters call this, never raw HTTP; builds/reads a DI container internally, public constructor signature unchanged |
 | `src/interfaces/` | App contracts: `ToolDef`, `CliCommand`, `ToolHook` | Types only |
-| `src/mcp/` | MCP adapter: `tools/` by domain, `hooks/` middleware chain, `server.ts` entry | Tool names/schemas are frozen contracts |
+| `src/mcp/` | MCP adapter: `tools/` by domain, `hooks/` middleware chain, `bootstrap.ts` (`startMcpServer()`), `server.ts` dev entry — published entry is the `kaiten mcp` CLI command | Tool names/schemas are frozen contracts |
 | `src/cli/` | CLI adapter: `commands/`, `projections.ts`, `help.ts`, `index.ts` entry | Output format is a frozen contract |
 | `src/lib/` | git + temp-dir helpers | |
 | `tests/` | bun:test, mocked transport, no network | |

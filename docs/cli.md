@@ -1,11 +1,22 @@
 # CLI
 
 ```bash
-npm install -g @nones/kaiten-mcp   # installs the `kaiten` and `kaiten-mcp` binaries
+npm install -g @nones/kaiten-mcp   # installs the single `kaiten` binary
 ```
 
 Configuration is the same as for the MCP server — see [configuration.md](configuration.md).
 Run `kaiten help` for the built-in reference (currently in Russian).
+
+## MCP server
+
+```bash
+kaiten mcp                       # start the stdio MCP server (blocks; run by MCP clients, not by hand)
+```
+
+`kaiten mcp` is how MCP clients launch the server since v4.0.0 (the separate `kaiten-mcp`
+binary is gone). From this point stdout carries the MCP JSON-RPC protocol and all
+diagnostics go to stderr — the command prints nothing of its own. See the
+[README](../README.md) for client config examples.
 
 ## Cards
 

@@ -2,8 +2,12 @@
 
 MCP (Model Context Protocol) server for Kaiten — lets Claude Code,
 Claude Desktop, Cursor and other MCP clients manage your Kaiten boards: cards, child
-cards, comments, tags, checklists, files and card-scoped git branches. Also ships a
-`kaiten` CLI and a typed SDK.
+cards, comments, tags, checklists, files and card-scoped git branches. Ships as a single
+`kaiten` binary: `kaiten mcp` starts the MCP server, every other command is a regular
+CLI; a typed SDK is exported for programmatic use.
+
+> **Migrating from v3?** The separate `kaiten-mcp` binary was removed in v4.0.0 — append
+> `mcp` to the command in your MCP config: `npx -y @nones/kaiten-mcp mcp`.
 
 ## Setup
 
@@ -20,7 +24,7 @@ You need two values:
 claude mcp add kaiten \
   -e KAITEN_API_URL=https://<kaiten_url>/api/latest \
   -e KAITEN_API_TOKEN=your_token \
-  -- npx -y @nones/kaiten-mcp
+  -- npx -y @nones/kaiten-mcp mcp
 ```
 
 **Claude Desktop / Cursor / other clients** — add to the MCP config
@@ -31,7 +35,7 @@ claude mcp add kaiten \
   "mcpServers": {
     "kaiten": {
       "command": "npx",
-      "args": ["-y", "@nones/kaiten-mcp"],
+      "args": ["-y", "@nones/kaiten-mcp", "mcp"],
       "env": {
         "KAITEN_API_URL": "https://<kaiten_url>/api/latest",
         "KAITEN_API_TOKEN": "your_token"
@@ -53,7 +57,7 @@ shell command that reads the token at startup:
       "command": "sh",
       "args": [
         "-c",
-        "token=\"$(sed -n 's/^KAITEN_API_TOKEN=//p' .env 2>/dev/null | head -n 1)\"; [ -n \"$token\" ] && export KAITEN_API_TOKEN=\"$token\"; exec npx -y @nones/kaiten-mcp"
+        "token=\"$(sed -n 's/^KAITEN_API_TOKEN=//p' .env 2>/dev/null | head -n 1)\"; [ -n \"$token\" ] && export KAITEN_API_TOKEN=\"$token\"; exec npx -y @nones/kaiten-mcp mcp"
       ],
       "env": {
         "KAITEN_API_URL": "https://<kaiten_url>/api/latest"
@@ -87,7 +91,7 @@ Deleting Kaiten entities is irreversible. To enable DELETE tools, a human must a
   "mcpServers": {
     "kaiten": {
       "command": "npx",
-      "args": ["-y", "@nones/kaiten-mcp"],
+      "args": ["-y", "@nones/kaiten-mcp", "mcp"],
       "env": {
         "KAITEN_API_URL": "https://<kaiten_url>/api/latest",
         "KAITEN_API_TOKEN": "your_token",

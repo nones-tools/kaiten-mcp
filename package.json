@@ -16,8 +16,7 @@
     }
   },
   "bin": {
-    "kaiten": "./dist/cli/index.js",
-    "kaiten-mcp": "./dist/mcp/server.js"
+    "kaiten": "./dist/cli/index.js"
   },
   "files": [
     "dist",

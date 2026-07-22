@@ -18,8 +18,12 @@ bun run pack       # build + create the npm tarball (bun pm pack)
 printf '%s\n%s\n%s\n' \
   '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smoke","version":"0"}}}' \
   '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
-  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | node dist/mcp/server.js
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | node dist/cli/index.js mcp
 ```
+
+`node dist/mcp/server.js` (the `bun run start` / `bun run dev` entry) runs the exact same
+`startMcpServer()` bootstrap from `src/mcp/bootstrap.ts` — the published way in is the
+`kaiten mcp` subcommand.
 
 ## Project workflow
 

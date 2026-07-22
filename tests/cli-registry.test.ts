@@ -46,7 +46,7 @@ describe('the real command registry', () => {
     const expected = [
       'cards', 'card', 'simple', 'card-simple', 'create', 'update', 'delete', 'move', 'assign',
       'subtask', 'comment', 'board', 'column', 'user', 'tag', 'find',
-      'git-branch', 'git-checkout', 'git-commit', 'git-push', 'git-status', 'help',
+      'git-branch', 'git-checkout', 'git-commit', 'git-push', 'git-status', 'mcp', 'help',
     ];
     for (const name of expected) {
       expect(registry.has(name)).toBe(true);

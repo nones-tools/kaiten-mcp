@@ -86,7 +86,7 @@ jobs:
             '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"ci","version":"0"}}}' \
             '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
             '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-            | node dist/mcp/server.js | node -e "
+            | node dist/cli/index.js mcp | node -e "
               let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{
                 const lines=d.trim().split('\n').map(JSON.parse);
                 const n=lines[1].result.tools.length;

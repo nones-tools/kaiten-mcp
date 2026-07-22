@@ -72,6 +72,11 @@ dependencies point inward only:
 ## Build
 
 `bun build` bundles three entries (`src/index.ts`, `src/cli/index.ts`,
-`src/mcp/server.ts`) for the Node target with dependencies external;
+`src/mcp/server.ts`) for the Node target with dependencies external. The package
+publishes a single `kaiten` bin (since 4.0.0): the MCP server starts via the `kaiten mcp`
+subcommand, which lazily imports the shared `startMcpServer()` bootstrap
+(`src/mcp/bootstrap.ts`) so the MCP adapter never loads for ordinary CLI commands;
+`dist/mcp/server.js` remains as the internal dev/`bun run start` entry over the same
+bootstrap.
 `tsc --emitDeclarationOnly` produces the `.d.ts` files. The published artifact contains
 only `dist/` + `README.md` and runs on plain Node >= 18.

@@ -5,6 +5,38 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+Single-binary package: the MCP server starts via the `kaiten mcp` CLI subcommand and the
+separate `kaiten-mcp` binary is removed. **Breaking** — ships as 4.0.0.
+
+### Breaking
+
+- The `kaiten-mcp` bin is removed from the package; `kaiten` is the only binary. Any MCP
+  client config that launched the server as `npx -y @nones/kaiten-mcp` (npx resolved that
+  to the now-removed `kaiten-mcp` bin) or as a global `kaiten-mcp` will now start the bare
+  CLI and fail with `Unknown command` — append the `mcp` argument.
+
+### Added
+
+- `kaiten mcp` CLI command — starts the stdio MCP server in-process. Same server as
+  before: the bootstrap moved verbatim from `src/mcp/server.ts` into a shared
+  `startMcpServer()` (`src/mcp/bootstrap.ts`); tool names, schemas and behavior are
+  unchanged. The MCP adapter is imported lazily, so every other CLI command starts as
+  fast as before.
+
+### Migration
+
+For humans and AI agents updating an installation:
+
+1. In MCP client configs (`claude_desktop_config.json`, `.cursor/mcp.json`,
+   `claude mcp add`, …) replace `npx -y @nones/kaiten-mcp` with
+   `npx -y @nones/kaiten-mcp mcp` — i.e. `"args": ["-y", "@nones/kaiten-mcp", "mcp"]`.
+2. Replace direct `kaiten-mcp` invocations (global installs, shell wrappers, systemd
+   units) with `kaiten mcp`.
+3. Nothing else changes: env variables, tool names/schemas, CLI output and root exports
+   are all identical to 3.3.0.
+
 ## 3.3.0 — 2026-07-21
 
 Agent guardrails & server modes (`specs/001-agent-guardrails`) — 12 new optional

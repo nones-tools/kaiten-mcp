@@ -37,6 +37,9 @@ Kaiten CLI - Полнофункциональный CLI для Kaiten API
 Команды для поиска:
   find <tag_name> [-m] [--board=<id|name>]  - Поиск по метке (-m = минимальный JSON, --board = фильтр по ID или названию доски)
 
+MCP-сервер:
+  mcp                            - Запустить stdio MCP-сервер для ИИ-агентов
+
 Команды для Git:
   git-branch <card_id>             - Создать ветку для задачи
   git-checkout <card_id>           - Переключиться на ветку задачи
