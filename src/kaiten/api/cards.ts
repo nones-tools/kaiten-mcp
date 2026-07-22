@@ -3,9 +3,16 @@ import type { Card, Checklist, ChecklistItem, Column, HttpTransport, Tag } from 
 export class CardsApi {
   constructor(private readonly client: HttpTransport) {}
 
+  /**
+   * `GET /cards?space_id=...` is the documented card-list endpoint
+   * (developers.kaiten.ru/cards/retrieve-card-list). The previously used
+   * `/spaces/{id}/cards` path is not in the API docs, and some Kaiten
+   * installations serve it as the unfiltered company-wide `/cards` list,
+   * silently ignoring the space (kaiten-mcp-zl8).
+   */
   getCards(spaceId: number, boardId?: number | null): Promise<Card[]> {
-    let url = `/spaces/${spaceId}/cards`;
-    if (boardId) url += `?board_id=${boardId}`;
+    let url = `/cards?space_id=${spaceId}`;
+    if (boardId) url += `&board_id=${boardId}`;
     return this.client.get<Card[]>(url);
   }
 

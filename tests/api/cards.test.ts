@@ -2,19 +2,19 @@ import { describe, expect, it } from 'bun:test';
 import { CardsApi } from '@/kaiten';
 import { createFakeFetch, makeClient } from './helpers';
 describe('CardsApi', () => {
-  it('getCards without boardId hits /spaces/{id}/cards', async () => {
+  it('getCards without boardId hits /cards?space_id=... (documented endpoint, kaiten-mcp-zl8)', async () => {
     const { fetchImpl, calls } = createFakeFetch([{ body: [] }]);
     const api = new CardsApi(makeClient(fetchImpl));
     await api.getCards(7);
     expect(calls[0]!.method).toBe('GET');
-    expect(calls[0]!.url).toBe('https://api.example.com/spaces/7/cards');
+    expect(calls[0]!.url).toBe('https://api.example.com/cards?space_id=7');
   });
 
   it('getCards with boardId adds board_id query param', async () => {
     const { fetchImpl, calls } = createFakeFetch([{ body: [] }]);
     const api = new CardsApi(makeClient(fetchImpl));
     await api.getCards(7, 42);
-    expect(calls[0]!.url).toBe('https://api.example.com/spaces/7/cards?board_id=42');
+    expect(calls[0]!.url).toBe('https://api.example.com/cards?space_id=7&board_id=42');
   });
 
   it('createCard POSTs to /cards with the given data', async () => {

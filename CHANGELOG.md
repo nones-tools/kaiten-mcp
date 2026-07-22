@@ -5,6 +5,20 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+### Fixed
+
+- `kaiten_cards` (and `KaitenSDK.getCards` / `kaiten cards`) now calls the documented
+  card-list endpoint `GET /cards?space_id=...[&board_id=...]` instead of the undocumented
+  `/spaces/{id}/cards` path. On some Kaiten installations (observed on an on-premise
+  2026 build) the old path was served as the unfiltered company-wide `/cards` list, so
+  space scoping — both `KAITEN_DEFAULT_SPACE_ID` and an explicit `spaceId` — was silently
+  ignored and the first 100 cards of the whole company came back (kaiten-mcp-zl8).
+  Board-scoped listings were unaffected, which is why the bug went unnoticed: the
+  `board_id` query param filters correctly on either path. Not a 4.0.0 regression — the
+  URL dated back to the 3.0.0 TypeScript rewrite.
+
 ## 4.0.0 — 2026-07-22
 
 Single-binary package: the MCP server starts via the `kaiten mcp` CLI subcommand and the
