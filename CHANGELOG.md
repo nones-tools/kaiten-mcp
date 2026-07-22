@@ -5,7 +5,7 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
-## Unreleased
+## 4.0.0 — 2026-07-22
 
 Single-binary package: the MCP server starts via the `kaiten mcp` CLI subcommand and the
 separate `kaiten-mcp` binary is removed. **Breaking** — ships as 4.0.0.
