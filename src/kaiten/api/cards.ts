@@ -1,5 +1,21 @@
 import type { Card, Checklist, ChecklistItem, Column, HttpTransport, Tag } from '../interfaces';
 
+/**
+ * Query options for the card-list endpoint, mapped 1:1 onto the documented
+ * `GET /cards` query params (developers.kaiten.ru/cards/retrieve-card-list).
+ * No defaults here - the API layer is a thin mapper; defaults live in
+ * `CardService.getCards`.
+ */
+export interface CardListOptions {
+  /** 1 = on board, 2 = archived, 'all' = no condition filter (server returns both). */
+  condition?: 1 | 2 | 'all';
+  /** Per-request page size; the server caps it at 100. */
+  limit?: number;
+  offset?: number;
+  orderBy?: string;
+  orderDirection?: 'asc' | 'desc';
+}
+
 export class CardsApi {
   constructor(private readonly client: HttpTransport) {}
 
@@ -10,10 +26,17 @@ export class CardsApi {
    * installations serve it as the unfiltered company-wide `/cards` list,
    * silently ignoring the space (kaiten-mcp-zl8).
    */
-  getCards(spaceId: number, boardId?: number | null): Promise<Card[]> {
-    let url = `/cards?space_id=${spaceId}`;
-    if (boardId) url += `&board_id=${boardId}`;
-    return this.client.get<Card[]>(url);
+  getCards(spaceId: number, boardId?: number | null, options: CardListOptions = {}): Promise<Card[]> {
+    const { condition, limit, offset, orderBy, orderDirection } = options;
+    return this.client.get<Card[]>('/cards', {
+      space_id: spaceId,
+      board_id: boardId ?? undefined,
+      condition: condition === 'all' ? undefined : condition,
+      limit,
+      offset,
+      order_by: orderBy,
+      order_direction: orderDirection,
+    });
   }
 
   getCard(cardId: number): Promise<Card> {

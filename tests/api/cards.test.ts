@@ -17,6 +17,22 @@ describe('CardsApi', () => {
     expect(calls[0]!.url).toBe('https://api.example.com/cards?space_id=7&board_id=42');
   });
 
+  it('getCards maps every list option onto the documented query params', async () => {
+    const { fetchImpl, calls } = createFakeFetch([{ body: [] }]);
+    const api = new CardsApi(makeClient(fetchImpl));
+    await api.getCards(7, 42, { condition: 2, limit: 50, offset: 100, orderBy: 'updated', orderDirection: 'desc' });
+    expect(calls[0]!.url).toBe(
+      'https://api.example.com/cards?space_id=7&board_id=42&condition=2&limit=50&offset=100&order_by=updated&order_direction=desc'
+    );
+  });
+
+  it("getCards condition: 'all' omits the condition param entirely (server then returns both)", async () => {
+    const { fetchImpl, calls } = createFakeFetch([{ body: [] }]);
+    const api = new CardsApi(makeClient(fetchImpl));
+    await api.getCards(7, null, { condition: 'all', limit: 10 });
+    expect(calls[0]!.url).toBe('https://api.example.com/cards?space_id=7&limit=10');
+  });
+
   it('createCard POSTs to /cards with the given data', async () => {
     const { fetchImpl, calls } = createFakeFetch([{ status: 201, body: { id: 1, title: 'New' } }]);
     const api = new CardsApi(makeClient(fetchImpl));

@@ -2,6 +2,9 @@ import { describe, expect, mock, test } from 'bun:test';
 import type { KaitenSDK } from '@/sdk';
 import { tools } from '@/mcp/tools';
 
+/** What the kaiten_cards handler forwards when no list option is given (all keys present, undefined). */
+const NO_LIST_OPTIONS = { condition: undefined, limit: undefined, offset: undefined, orderBy: undefined, orderDirection: undefined };
+
 /**
  * Expected tool list + required-param sets, transcribed directly from the
  * old hand-rolled server's `registerTools()` in mcp-server.js (root of the
@@ -217,21 +220,28 @@ describe('mcp tool handlers - delegation to SDK', () => {
     const getCards = mock(async () => []);
     const sdk = makeStubSdk({ getCards });
     await toolByName('kaiten_cards').handler(sdk, {});
-    expect(getCards).toHaveBeenCalledWith(null, null, false);
+    expect(getCards).toHaveBeenCalledWith(null, null, false, NO_LIST_OPTIONS);
   });
 
   test('kaiten_cards minimal=true is passed through', async () => {
     const getCards = mock(async () => []);
     const sdk = makeStubSdk({ getCards });
     await toolByName('kaiten_cards').handler(sdk, { spaceId: 5, boardId: 9, minimal: true });
-    expect(getCards).toHaveBeenCalledWith(5, 9, true);
+    expect(getCards).toHaveBeenCalledWith(5, 9, true, NO_LIST_OPTIONS);
   });
 
   test('kaiten_cards minimal only becomes true for boolean true (not truthy values)', async () => {
     const getCards = mock(async () => []);
     const sdk = makeStubSdk({ getCards });
     await toolByName('kaiten_cards').handler(sdk, { minimal: 'yes' as unknown as boolean });
-    expect(getCards).toHaveBeenCalledWith(null, null, false);
+    expect(getCards).toHaveBeenCalledWith(null, null, false, NO_LIST_OPTIONS);
+  });
+
+  test('kaiten_cards forwards condition/limit/offset/orderBy/orderDirection to the SDK', async () => {
+    const getCards = mock(async () => []);
+    const sdk = makeStubSdk({ getCards });
+    await toolByName('kaiten_cards').handler(sdk, { condition: 2, limit: 300, offset: 50, orderBy: 'created', orderDirection: 'asc' });
+    expect(getCards).toHaveBeenCalledWith(null, null, false, { condition: 2, limit: 300, offset: 50, orderBy: 'created', orderDirection: 'asc' });
   });
 
   test('kaiten_update_card JSON.parses the legacy data string param (backward compat)', async () => {

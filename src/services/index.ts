@@ -1,5 +1,6 @@
 export { BlockerService } from './blocker.service';
 export { BoardService } from './board.service';
+export { collectCardPages, MAX_PAGES, PAGE_SIZE } from './card-paging';
 export { CardService } from './card.service';
 export type { CreateCardInput } from './card.service';
 export { ChecklistService } from './checklist.service';

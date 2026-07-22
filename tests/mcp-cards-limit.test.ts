@@ -2,6 +2,9 @@ import { describe, expect, mock, test } from 'bun:test';
 import type { KaitenSDK } from '@/sdk';
 import { tools } from '@/mcp/tools';
 
+/** What the kaiten_cards handler forwards when no list option is given (all keys present, undefined). */
+const NO_LIST_OPTIONS = { condition: undefined, limit: undefined, offset: undefined, orderBy: undefined, orderDirection: undefined };
+
 /**
  * US6 (specs/001-agent-guardrails): `KAITEN_CARDS_LIMIT` truncation and
  * `KAITEN_MINIMAL_DEFAULT` for `kaiten_cards`/`kaiten_find_cards`. Drives the
@@ -60,28 +63,28 @@ describe('kaiten_cards - US6 cards limit / minimal default', () => {
     const getCards = mock(async () => []);
     const sdk = stubSdk(getCards, { minimalDefault: true });
     await toolByName('kaiten_cards').handler(sdk, {});
-    expect(getCards).toHaveBeenCalledWith(null, null, true);
+    expect(getCards).toHaveBeenCalledWith(null, null, true, NO_LIST_OPTIONS);
   });
 
   test('explicit minimal:false wins over minimalDefault: true', async () => {
     const getCards = mock(async () => []);
     const sdk = stubSdk(getCards, { minimalDefault: true });
     await toolByName('kaiten_cards').handler(sdk, { minimal: false });
-    expect(getCards).toHaveBeenCalledWith(null, null, false);
+    expect(getCards).toHaveBeenCalledWith(null, null, false, NO_LIST_OPTIONS);
   });
 
   test('explicit minimal:true wins regardless of minimalDefault', async () => {
     const getCards = mock(async () => []);
     const sdk = stubSdk(getCards, { minimalDefault: false });
     await toolByName('kaiten_cards').handler(sdk, { minimal: true });
-    expect(getCards).toHaveBeenCalledWith(null, null, true);
+    expect(getCards).toHaveBeenCalledWith(null, null, true, NO_LIST_OPTIONS);
   });
 
   test('minimalDefault unset -> full payload as today', async () => {
     const getCards = mock(async () => []);
     const sdk = stubSdk(getCards, {});
     await toolByName('kaiten_cards').handler(sdk, {});
-    expect(getCards).toHaveBeenCalledWith(null, null, false);
+    expect(getCards).toHaveBeenCalledWith(null, null, false, NO_LIST_OPTIONS);
   });
 });
 

@@ -13,6 +13,7 @@ import { UsersApi } from './users';
 export { BlockersApi } from './blockers';
 export { BoardsApi } from './boards';
 export { CardsApi } from './cards';
+export type { CardListOptions } from './cards';
 export { CommentsApi } from './comments';
 export { CompanyApi } from './company';
 export { FilesApi } from './files';

@@ -2,6 +2,9 @@ import { describe, expect, it, mock } from 'bun:test';
 import type { Card, KaitenApiPort, KaitenConfig } from '@/kaiten';
 import { AccessGuard, CardService, TagService } from '@/services';
 
+/** The 4.1.0 list defaults CardService applies before hitting the API (kaiten-mcp-3mh). */
+const DEFAULT_PAGE_OPTIONS = { condition: 1, limit: 100, offset: 0, orderBy: 'updated', orderDirection: 'desc' };
+
 type Config = Pick<
   KaitenConfig,
   | 'defaultSpaceId'
@@ -58,19 +61,19 @@ describe('CardService.getCards - US1 board allowlist / default board (specs/001-
   it('scopes listing to defaultBoardId when no boardId argument is given', async () => {
     const { cardService, getCardsMock } = makeCardService({ defaultBoardId: 10 }, []);
     await cardService.getCards(5);
-    expect(getCardsMock).toHaveBeenCalledWith(5, 10);
+    expect(getCardsMock).toHaveBeenCalledWith(5, 10, DEFAULT_PAGE_OPTIONS);
   });
 
   it('an explicit boardId argument wins over defaultBoardId', async () => {
     const { cardService, getCardsMock } = makeCardService({ defaultBoardId: 10 }, []);
     await cardService.getCards(5, 20);
-    expect(getCardsMock).toHaveBeenCalledWith(5, 20);
+    expect(getCardsMock).toHaveBeenCalledWith(5, 20, DEFAULT_PAGE_OPTIONS);
   });
 
-  it('unchanged behavior when no allowlist/default is set - no board query param at all', async () => {
+  it('no allowlist/default set - board argument is null, so no board query param is sent', async () => {
     const { cardService, getCardsMock } = makeCardService({}, []);
     await cardService.getCards(5);
-    expect(getCardsMock).toHaveBeenCalledWith(5);
+    expect(getCardsMock).toHaveBeenCalledWith(5, null, DEFAULT_PAGE_OPTIONS);
   });
 
   it('rejects an explicit boardId outside allowedBoardIds (direct addressing, not a silent filter)', async () => {

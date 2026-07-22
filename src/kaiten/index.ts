@@ -14,6 +14,7 @@ export {
   TimeLogsApi,
   UsersApi,
 } from './api';
+export type { CardListOptions } from './api';
 export { loadConfig, loadConfigLenient, parseEnvFile } from './config';
 export { KaitenApiError, KaitenClient, KaitenDeleteDisabledError, KaitenReadOnlyError, KaitenTimeoutError } from './http';
 export type { KaitenClientOptions, QueryParams } from './http';

@@ -5,6 +5,35 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+Card listings became usable on large boards (kaiten-mcp-3mh): sensible defaults
+(active cards, newest first) and automatic pagination past the server's 100-card page cap.
+
+### Changed
+
+- **`kaiten_cards` / `KaitenSDK.getCards` / `kaiten cards` list defaults** are now
+  `condition: 1` (on-board cards only), sorted `updated` `desc` (newest first). Previously
+  the server's own defaults applied — all conditions, oldest first — so on large boards the
+  first 100 cards were exclusively ancient archived ones and active work was unreachable.
+  Old behavior remains addressable: `condition: 'all'` plus `orderBy: 'id'`,
+  `orderDirection: 'asc'`. Tag/find listings (`kaiten_find_cards`, `getCardsWithTag`) go
+  through the same path and now also search active cards, newest first.
+  *Versioning note*: formally a default change (constitution IV would call for a major);
+  shipped in a minor by explicit maintainer decision — the previous defaults were
+  server-incidental, undocumented, and unusable in practice.
+
+### Added
+
+- New optional `kaiten_cards` params, mapped onto the documented `GET /cards` query
+  (developers.kaiten.ru/cards/retrieve-card-list): `condition` (`1` | `2` | `'all'`),
+  `limit` (1–1000, default 100), `offset`, `orderBy`, `orderDirection` (`'asc'`/`'desc'`).
+  Same options object on `KaitenSDK.getCards(spaceId, boardId, minimal, options)` —
+  additive 4th parameter — and on `CardsApi.getCards`. New root export: `CardListOptions`.
+- **Auto-pagination**: a `limit` above the server's per-request cap of 100 is fetched in
+  sequential pages of 100, stopping early on a short page and hard-capped at 10 pages
+  (1000 cards) to stay friendly with Kaiten's rate limiting.
+
 ## 4.0.1 — 2026-07-22
 
 ### Fixed

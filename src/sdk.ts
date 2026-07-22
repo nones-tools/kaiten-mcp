@@ -1,5 +1,5 @@
 import type {
-  Board, Card, CardBlocker, CardFile, CardType,
+  Board, Card, CardBlocker, CardFile, CardListOptions, CardType,
   Checklist, ChecklistItem, Column, Comment, CustomProperty,
   ExternalLink, KaitenApi, KaitenClient, KaitenConfig, Lane, Space, Tag, TimeLog, User,
 } from './kaiten';
@@ -80,7 +80,7 @@ export class KaitenSDK {
   }
 
   // Cards
-  getCards(spaceId: number | null = null, boardId: number | null = null, minimal = false): Promise<Card[] | MinimalCard[]> { return this.cards.getCards(spaceId, boardId, minimal); }
+  getCards(spaceId: number | null = null, boardId: number | null = null, minimal = false, options: CardListOptions = {}): Promise<Card[] | MinimalCard[]> { return this.cards.getCards(spaceId, boardId, minimal, options); }
   getCard(cardId: number, minimal = false): Promise<Card | MinimalCard> { return this.cards.getCard(cardId, minimal); }
   createCard(input: CreateCardInput): Promise<Card> { return this.cards.createCard(input); }
   updateCard(cardId: number, data: Record<string, unknown>): Promise<Card> { return this.cards.updateCard(cardId, data); }

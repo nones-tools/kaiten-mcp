@@ -9,7 +9,10 @@ const sdk = createSDK();                 // config from env/files (see configura
 // or with explicit overrides:
 const sdk2 = createSDK({ apiUrl: '...', apiToken: '...' });
 
+// Defaults (4.1.0): condition 1 (on-board cards), orderBy 'updated', orderDirection 'desc',
+// limit 100. A limit above 100 (up to 1000) is fetched in sequential pages automatically.
 const cards = await sdk.getCards(spaceId, boardId, /* minimal */ true);
+const archived = await sdk.getCards(spaceId, boardId, false, { condition: 2, limit: 300 });
 const card  = await sdk.getCard(cardId);
 await sdk.createCard({ title: 'Task', boardId, columnId /* optional if KAITEN_DEFAULT_COLUMN_ID is set */, laneId });
 await sdk.moveToColumn(cardId, columnId, laneId);

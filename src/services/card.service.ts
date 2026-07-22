@@ -1,8 +1,9 @@
 import { inject, injectable } from 'inversify';
-import type { Card, KaitenApiPort, KaitenConfig } from '../kaiten';
+import type { Card, CardListOptions, KaitenApiPort, KaitenConfig } from '../kaiten';
 import { TOKENS } from '../di/tokens';
 import type { AccessGuard } from './guard';
 import { type MinimalCard, toMinimalCard } from './projections';
+import { collectCardPages } from './card-paging';
 
 export interface CreateCardInput {
   title: string;
@@ -49,15 +50,27 @@ export class CardService {
    * silently narrowed to the board/column/lane allowlists (FR-001, FR-004) -
    * a defense-in-depth filter that also covers the space-wide, no-board-arg
    * case where multiple boards can appear in one response.
+   *
+   * Since 4.1.0 the defaults are `condition: 1` (on-board cards only; pass
+   * `2` for archived, `'all'` for both) and `updated` `desc` ordering - the
+   * server's own defaults (all conditions, oldest first) made large boards
+   * return only ancient archived cards (kaiten-mcp-3mh). `limit` above the
+   * server's per-request cap of 100 is fetched in sequential pages,
+   * bounded by MAX_PAGES.
    */
-  async getCards(spaceId: number | null = null, boardId: number | null = null, minimal = false): Promise<Card[] | MinimalCard[]> {
+  async getCards(
+    spaceId: number | null = null,
+    boardId: number | null = null,
+    minimal = false,
+    options: CardListOptions = {}
+  ): Promise<Card[] | MinimalCard[]> {
     const id = spaceId || this.config.defaultSpaceId;
     this.guard.validateSpaceId(id);
     const effectiveBoardId = boardId || this.config.defaultBoardId;
     if (effectiveBoardId) this.guard.validateBoardId(effectiveBoardId);
-    const cards = effectiveBoardId
-      ? await this.api.cards.getCards(id as number, effectiveBoardId)
-      : await this.api.cards.getCards(id as number);
+    const cards = await collectCardPages(options, (pageOptions) =>
+      this.api.cards.getCards(id as number, effectiveBoardId ?? null, pageOptions)
+    );
     const scoped = this.filterScope(cards);
     if (!minimal) return scoped;
     return scoped.map(toMinimalCard);

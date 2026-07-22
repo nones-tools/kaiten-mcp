@@ -7,7 +7,8 @@ export const cardTools: ToolDef[] = [
   {
     name: 'kaiten_cards',
     description:
-      'Get list of cards (optimized format). May return a truncated-list wrapper ' +
+      'Get list of cards, newest-updated first, active (on-board) cards only by default — ' +
+      'pass condition: 2 for archived or "all" for both. May return a truncated-list wrapper ' +
       '({ truncated, total, returned, note, cards }) instead of a plain array when KAITEN_CARDS_LIMIT is set and exceeded.',
     annotations: { readOnlyHint: true },
     inputSchema: {
@@ -17,11 +18,31 @@ export const cardTools: ToolDef[] = [
         .boolean()
         .optional()
         .describe('Return minimal JSON format (token optimized). Default false (full payload), or KAITEN_MINIMAL_DEFAULT.'),
+      condition: z
+        .union([z.literal(1), z.literal(2), z.literal('all')])
+        .optional()
+        .describe('1 = active cards on the board (default), 2 = archived, "all" = both.'),
+      limit: z
+        .number()
+        .int()
+        .min(1)
+        .max(1000)
+        .optional()
+        .describe('Max cards to return (default 100). Values above 100 are fetched in pages of 100 automatically.'),
+      offset: z.number().int().min(0).optional().describe('Number of cards to skip (pagination).'),
+      orderBy: z.string().optional().describe("Sort field (default 'updated')."),
+      orderDirection: z.enum(['asc', 'desc']).optional().describe("Sort direction (default 'desc' — newest first)."),
     },
     handler: async (sdk, args) => {
       const explicitMinimal = args.minimal === true ? true : args.minimal === false ? false : undefined;
       const minimal = explicitMinimal ?? sdk.config?.minimalDefault ?? false;
-      const result = await sdk.getCards(args.spaceId ?? null, args.boardId ?? null, minimal);
+      const result = await sdk.getCards(args.spaceId ?? null, args.boardId ?? null, minimal, {
+        condition: args.condition,
+        limit: args.limit,
+        offset: args.offset,
+        orderBy: args.orderBy,
+        orderDirection: args.orderDirection,
+      });
       return applyCardsLimit(result, sdk.config?.cardsLimit ?? null);
     },
   },
