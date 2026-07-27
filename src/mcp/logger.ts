@@ -34,10 +34,19 @@ export function log(level: keyof typeof LOG_LEVELS, message: string, data?: unkn
   const timestamp = new Date().toISOString();
   const msg = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
   if (data !== undefined) {
-    console.error(msg, typeof data === 'string' ? data : JSON.stringify(data));
+    console.error(msg, typeof data === 'string' ? redact(data) : JSON.stringify(redact(data)));
   } else {
     console.error(msg);
   }
+}
+
+function redact(value: unknown): unknown {
+  if (typeof value === 'string') return value.replace(/Bearer\s+[^\s,]+/gi, 'Bearer [REDACTED]').replace(/([?&](?:token|access_token|api[_-]?key)=)[^&\s]+/gi, '$1[REDACTED]');
+  if (Array.isArray(value)) return value.map(redact);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, /token|authorization|secret|password/i.test(key) ? '[REDACTED]' : redact(item)]));
+  }
+  return value;
 }
 
 export function errorLog(message: string, data?: unknown): void {

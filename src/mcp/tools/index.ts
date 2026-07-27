@@ -1,12 +1,13 @@
 import type { ToolDef } from '../../interfaces';
 import { blockerTools } from './blockers';
-import { cardTools, newCardTools } from './cards';
+import { cardTools, findCardsByTagTool, newCardTools } from './cards';
 import { checklistTools } from './checklists';
 import { commentTools, newCommentTools, tagTools } from './comments-tags';
 import { dictionaryTools } from './dictionaries';
 import { fileTools, newFileTools } from './files';
 import { gitTools } from './git';
 import { hierarchyTools } from './hierarchy';
+import { healthTool } from './health';
 import { linkTools } from './links';
 import { navigationTools, newNavigationTools } from './navigation';
 import { timeLogTools } from './timelogs';
@@ -52,7 +53,10 @@ export const tools: ToolDef[] = [
   ...blockerTools,
   ...linkTools,
   ...newFileTools,
+  findCardsByTagTool,
 ];
+
+export { healthTool };
 
 /**
  * US5 (specs/001-agent-guardrails): `KAITEN_DISABLED_TOOLS` hides tools from

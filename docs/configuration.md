@@ -7,6 +7,20 @@ Settings are merged from the following sources, highest precedence first:
 3. `./.env`
 4. `~/.kaiten/config` — global settings, the right place for your token
 
+## Configuration precedence
+
+Higher rows override lower rows for each variable independently:
+
+| Priority | Source |
+| --- | --- |
+| 1 | MCP process environment |
+| 2 | `KAITEN_CONFIG_FILE=/absolute/path/to/file` |
+| 3 | `<cwd>/.kaiten.env` |
+| 4 | `<cwd>/.env` |
+| 5 | `~/.kaiten/config` |
+
+`KAITEN_CONFIG_FILE` must point to a readable file. A missing or inaccessible path produces a safe `INVALID_CONFIGURATION` diagnostic; its contents are never logged. Set an explicit MCP `cwd` when using project files.
+
 All files use plain `KEY=VALUE` lines; `#` starts a comment.
 
 ## Variables

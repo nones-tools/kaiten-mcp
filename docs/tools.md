@@ -33,6 +33,8 @@ Tools backed by an HTTP DELETE call are also gated behind `KAITEN_API_DELETE_ALL
 | `kaiten_archive_card` | `cardId` | Sets `condition` to archived |
 | `kaiten_unarchive_card` | `cardId` | Sets `condition` back to active |
 | `kaiten_find_cards` | `tagName`, `boardId?` | Returns only `id`, `title`, `board_id`, `column_id`, `tags`. Filtered by `KAITEN_ALLOWED_BOARD_IDS` when set. May return the same truncated-list wrapper as `kaiten_cards` when `KAITEN_CARDS_LIMIT` is set and exceeded. Read-only. |
+| `kaiten_find_cards_by_tag` | `tagName`, `boardId?` | Clearly named additive alias of `kaiten_find_cards`; both use exact tag matching. |
+| `kaiten_health` | — | Local, read-only diagnostics: version, cwd, configuration presence/source, normalized URL origin and readiness. Never contacts Kaiten or returns secrets. |
 
 ## Card hierarchy
 

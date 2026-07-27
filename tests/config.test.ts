@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { loadConfig, parseEnvFile } from '@/kaiten';
+import { inspectConfig, loadConfig, parseEnvFile } from '@/kaiten';
 
 describe('parseEnvFile', () => {
   it('parses simple KEY=VALUE lines', () => {
@@ -129,6 +129,27 @@ describe('loadConfig', () => {
     const config = loadConfig();
     expect(config.apiUrl).toBe('https://from-process-env.example');
     expect(config.apiToken).toBe('kaiten-env-token');
+  });
+
+  it('uses KAITEN_CONFIG_FILE ahead of cwd files, while process env still wins', () => {
+    const configFile = path.join(tmpDir, 'explicit.env');
+    fs.writeFileSync(path.join(tmpDir, '.env'), 'KAITEN_API_URL=https://cwd.example\nKAITEN_API_TOKEN=cwd-secret\n');
+    fs.writeFileSync(configFile, 'KAITEN_API_URL=https://explicit.example/path?token=leak\nKAITEN_API_TOKEN=explicit-secret\n');
+    process.env.KAITEN_CONFIG_FILE = configFile;
+    process.env.KAITEN_API_URL = 'https://process.example';
+    const config = loadConfig();
+    expect(config.apiUrl).toBe('https://process.example');
+    expect(config.apiToken).toBe('explicit-secret');
+    const health = inspectConfig();
+    expect(health.apiUrl).toEqual({ present: true, source: 'process env', origin: 'https://process.example' });
+    expect(health.apiToken).toEqual({ present: true, source: 'explicit config-file' });
+    expect(JSON.stringify(health)).not.toContain('explicit-secret');
+  });
+
+  it('reports an unreadable explicit config file safely', () => {
+    process.env.KAITEN_CONFIG_FILE = path.join(tmpDir, 'missing.env');
+    expect(() => loadConfig()).toThrow(/KAITEN_CONFIG_FILE does not exist/);
+    expect(inspectConfig()).toMatchObject({ ready: false, errorCode: 'INVALID_CONFIGURATION' });
   });
 
   it('the `overrides` argument wins over process.env and files', () => {

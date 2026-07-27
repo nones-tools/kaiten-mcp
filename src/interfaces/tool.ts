@@ -23,4 +23,6 @@ export interface ToolDef {
   inputSchema: z.ZodRawShape;
   handler: (sdk: KaitenSDK, args: any) => Promise<unknown>;
   annotations?: ToolAnnotations;
+  /** Health/diagnostic tools may run before credentials or an SDK exist. */
+  requiresSdk?: boolean;
 }

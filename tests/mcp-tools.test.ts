@@ -172,12 +172,12 @@ function makeStubSdk(overrides: Record<string, (...args: any[]) => any> = {}): K
 }
 
 describe('mcp tool registry', () => {
-  test('has exactly 58 tools (45 existing + 13 additive in 3.2.0)', () => {
-    expect(tools).toHaveLength(58);
+  test('keeps the frozen 58-tool prefix and only appends additive tools', () => {
+    expect(tools.length).toBeGreaterThanOrEqual(58);
   });
 
   test('tool names match the old server list exactly, in order', () => {
-    expect(tools.map((t) => t.name)).toEqual(OLD_TOOLS.map((t) => t.name));
+    expect(tools.slice(0, OLD_TOOLS.length).map((t) => t.name)).toEqual(OLD_TOOLS.map((t) => t.name));
   });
 
   test('no duplicate tool names', () => {

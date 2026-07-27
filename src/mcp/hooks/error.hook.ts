@@ -1,5 +1,5 @@
 import type { ToolHook } from '../../interfaces';
-import { KaitenApiError } from '../../kaiten';
+import { KaitenApiError, KaitenConfigError, KaitenTimeoutError } from '../../kaiten';
 import { errorLog } from '../logger';
 
 /**
@@ -13,11 +13,12 @@ export const errorHook: ToolHook = async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    let text = `Tool ${ctx.toolName} failed: ${message}`;
+    const message = safeMessage(error instanceof Error ? error.message : String(error));
+    const code = error instanceof KaitenConfigError ? error.code : error instanceof KaitenTimeoutError ? 'TIMEOUT' : error instanceof KaitenApiError ? 'API_ERROR' : 'INVALID_CONFIGURATION';
+    let text = `Tool ${ctx.toolName} failed: [${code}] ${message}`;
     if (error instanceof KaitenApiError) {
-      text += ` (HTTP ${error.status}) - ${JSON.stringify(error.body)}`;
-      errorLog('Tool error:', { toolName: ctx.toolName, message, httpStatus: error.status, responseData: error.body });
+      text += ` (HTTP ${error.status})`;
+      errorLog('Tool error:', { toolName: ctx.toolName, code, message, httpStatus: error.status });
     } else {
       errorLog('Tool error:', { toolName: ctx.toolName, message });
     }
@@ -27,3 +28,9 @@ export const errorHook: ToolHook = async (ctx, next) => {
     };
   }
 };
+
+function safeMessage(message: string): string {
+  return message
+    .replace(/Bearer\s+[^\s,]+/gi, 'Bearer [REDACTED]')
+    .replace(/([?&](?:token|access_token|api[_-]?key)=)[^&\s]+/gi, '$1[REDACTED]');
+}

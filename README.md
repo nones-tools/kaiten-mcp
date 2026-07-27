@@ -7,7 +7,38 @@ cards, comments, tags, checklists, files and card-scoped git branches. Ships as 
 CLI; a typed SDK is exported for programmatic use.
 
 > **Migrating from v3?** The separate `kaiten-mcp` binary was removed in v4.0.0 — append
-> `mcp` to the command in your MCP config: `npx -y @nones/kaiten-mcp mcp`.
+> `mcp` to the command in your MCP config: prefer the project-local binary `kaiten mcp`; `npx -y @nones/kaiten-mcp mcp` remains supported.
+
+## MCP clients (project-local install)
+
+Install once in the project that owns the integration:
+
+```sh
+npm install -D @nones/kaiten-mcp
+```
+
+Use the local executable and set `cwd` explicitly so file-based configuration is deterministic:
+
+```json
+{
+  "mcpServers": {
+    "kaiten": {
+      "command": "./node_modules/.bin/kaiten",
+      "args": ["mcp"],
+      "cwd": "/absolute/path/to/project",
+      "env": { "KAITEN_CONFIG_FILE": "/absolute/path/to/kaiten.env" }
+    }
+  }
+}
+```
+
+The same entry shape works in Codex Desktop, Claude Code/Claude Desktop and Cursor; place it in that client's MCP configuration file. You may instead use `npx -y @nones/kaiten-mcp mcp` as `command`/`args` where a local dependency is not desired.
+
+Run `kaiten_health` after connecting to verify only safe metadata (sources, readiness and normalized API origin).
+
+## Secret safety
+
+Tokens and config-file contents are never returned by `kaiten_health`, MCP errors, or diagnostics. Prefer an MCP client `env` block or a permissions-restricted `KAITEN_CONFIG_FILE`; do not put tokens in URLs.
 
 ## Setup
 

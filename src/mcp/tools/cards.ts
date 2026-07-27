@@ -202,6 +202,13 @@ export const cardTools: ToolDef[] = [
   },
 ];
 
+/** Additive, accurately named alias. `kaiten_find_cards` remains frozen for compatibility. */
+export const findCardsByTagTool: ToolDef = {
+  ...cardTools[cardTools.length - 1],
+  name: 'kaiten_find_cards_by_tag',
+  description: 'Find cards by exact tag name. Alias of kaiten_find_cards; this name makes its tag-only semantics explicit.',
+};
+
 // `newCardTools` (3.1.0 additive tools) moved to ./cards-additive.ts to keep
 // this file under the 200-line limit; re-exported unchanged via tools/index.ts.
 export { newCardTools } from './cards-additive';

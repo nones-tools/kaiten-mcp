@@ -40,3 +40,15 @@ export interface KaitenConfig {
   /** `KAITEN_HTTP_RETRIES` - non-negative int; extra retry attempts for GET requests only; `null` = no retries. */
   httpRetries: number | null;
 }
+
+export type ConfigSource = 'process env' | 'explicit config-file' | '.kaiten.env' | '.env' | '~/.kaiten/config' | null;
+
+/** Safe-to-display configuration state. It deliberately contains no secrets. */
+export interface KaitenConfigHealth {
+  cwd: string;
+  apiUrl: { present: boolean; source: ConfigSource; origin: string | null };
+  apiToken: { present: boolean; source: ConfigSource };
+  ready: boolean;
+  actions: string[];
+  errorCode?: 'INVALID_CONFIGURATION';
+}

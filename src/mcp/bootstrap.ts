@@ -8,7 +8,7 @@ import { loadConfigLenient } from '../kaiten';
 import { KaitenSDK } from '../sdk';
 import { compose, errorHook, loggingHook } from './hooks';
 import { logLevel } from './logger';
-import { filterTools, tools } from './tools';
+import { filterTools, healthTool, tools } from './tools';
 
 const SERVER_NAME = 'kaiten-mcp';
 
@@ -23,7 +23,7 @@ const SERVER_NAME = 'kaiten-mcp';
  * relative to this file resolves to the repo/package root in all three
  * layouts (src/mcp/, dist/mcp/ and dist/cli/ are the same depth).
  */
-function readVersion(): string {
+export function readVersion(): string {
   const here = dirname(fileURLToPath(import.meta.url));
   const pkg = JSON.parse(readFileSync(join(here, '../../package.json'), 'utf-8')) as { version: string };
   return pkg.version;
@@ -53,14 +53,15 @@ export async function startMcpServer(): Promise<void> {
     return sdk;
   }
 
-  const server = new McpServer({ name: SERVER_NAME, version: readVersion() });
+  const version = readVersion();
+  const server = new McpServer({ name: SERVER_NAME, version });
 
   // `loadConfigLenient()` never throws on missing credentials - `tools/list`
   // must work before `KAITEN_API_URL`/`KAITEN_API_TOKEN` are configured, so
   // this can't reuse the credential-requiring `loadConfig()` the SDK uses
   // internally. Only `disabledTools` is read here (US5, specs/001-agent-guardrails).
   const { disabledTools } = loadConfigLenient();
-  const { kept: registeredTools, unknown: unknownDisabledTools } = filterTools(tools, disabledTools);
+  const { kept: registeredTools, unknown: unknownDisabledTools } = filterTools([...tools, healthTool(version)], disabledTools);
   if (unknownDisabledTools.length > 0) {
     console.error(
       `KAITEN_DISABLED_TOOLS names no known tool (ignored): ${unknownDisabledTools.join(', ')}`
@@ -71,7 +72,7 @@ export async function startMcpServer(): Promise<void> {
   // formatting wraps the terminal handler (chain of responsibility).
   for (const tool of registeredTools) {
     const runTool = compose([loggingHook, errorHook], async (ctx) => {
-      const result = await tool.handler(getSdk(), ctx.args ?? {});
+      const result = await tool.handler(tool.requiresSdk === false ? (undefined as never) : getSdk(), ctx.args ?? {});
       ctx.response = {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       };

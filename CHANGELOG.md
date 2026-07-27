@@ -5,6 +5,26 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+### Added
+
+- `kaiten_health`: local read-only diagnostics for stdio MCP installations. It reports
+  server version, cwd, safe credential presence/provenance, normalized API origin and
+  readiness without contacting Kaiten or exposing secrets.
+- `KAITEN_CONFIG_FILE` for an explicit, absolute configuration-file path. Per-variable
+  precedence is process environment, explicit file, `<cwd>/.kaiten.env`, `<cwd>/.env`,
+  then `~/.kaiten/config`.
+- `kaiten_find_cards_by_tag`, an accurately named additive alias for the preserved
+  tag-only `kaiten_find_cards` behavior.
+
+### Changed
+
+- MCP startup keeps SDK/API initialization lazy, so handshake and tool discovery work
+  without credentials or network access.
+- MCP failures now use stable codes for missing/invalid configuration, timeouts and API
+  failures; diagnostics redact bearer tokens and query secrets and never include API bodies.
+
 ## 4.1.0 — 2026-07-22
 
 Card listings became usable on large boards (kaiten-mcp-3mh): sensible defaults

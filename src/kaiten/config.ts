@@ -2,7 +2,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { parseBool, parseIntList, parseNameList, parseNonNegativeInt, parsePositiveInt } from './config-parse';
-import type { KaitenConfig } from './interfaces';
+import type { ConfigSource, KaitenConfig, KaitenConfigHealth } from './interfaces';
 
 export type { KaitenConfig } from './interfaces';
 
@@ -24,10 +24,14 @@ export function parseEnvFile(content: string): Record<string, string> {
   return result;
 }
 
-function readEnvFile(filePath: string): Record<string, string> {
+function readEnvFile(filePath: string, required = false): Record<string, string> {
   try {
     return parseEnvFile(fs.readFileSync(filePath, 'utf8'));
-  } catch {
+  } catch (error) {
+    if (required) {
+      const reason = (error as NodeJS.ErrnoException).code === 'ENOENT' ? 'does not exist' : 'cannot be read';
+      throw new KaitenConfigError('INVALID_CONFIGURATION', `KAITEN_CONFIG_FILE ${reason}. Use an absolute path to a readable config file.`);
+    }
     return {};
   }
 }
@@ -41,17 +45,31 @@ function readProcessEnv(): Record<string, string> {
 }
 
 /** Merges the four config sources, lowest to highest precedence. */
-function readMergedEnv(): Record<string, string> {
-  const homeConfig = readEnvFile(path.join(os.homedir(), '.kaiten', 'config'));
-  const dotEnv = readEnvFile(path.join(process.cwd(), '.env'));
-  const kaitenEnv = readEnvFile(path.join(process.cwd(), '.kaiten.env'));
+interface MergedEnv { values: Record<string, string>; sources: Record<string, ConfigSource>; }
+
+function addLayer(target: MergedEnv, values: Record<string, string>, source: ConfigSource): void {
+  for (const [key, value] of Object.entries(values)) {
+    target.values[key] = value;
+    target.sources[key] = source;
+  }
+}
+
+/** Merges sources without ever retaining their file content outside this call. */
+function readMergedEnv(): MergedEnv {
+  const merged: MergedEnv = { values: {}, sources: {} };
+  addLayer(merged, readEnvFile(path.join(os.homedir(), '.kaiten', 'config')), '~/.kaiten/config');
+  addLayer(merged, readEnvFile(path.join(process.cwd(), '.env')), '.env');
+  addLayer(merged, readEnvFile(path.join(process.cwd(), '.kaiten.env')), '.kaiten.env');
+  const explicitFile = process.env.KAITEN_CONFIG_FILE;
+  if (explicitFile) addLayer(merged, readEnvFile(explicitFile, true), 'explicit config-file');
   const processEnv = readProcessEnv();
-  return { ...homeConfig, ...dotEnv, ...kaitenEnv, ...processEnv };
+  addLayer(merged, processEnv, 'process env');
+  return merged;
 }
 
 /** Builds a `KaitenConfig` from merged env sources plus `overrides`; never throws. */
 function buildConfig(overrides: Partial<KaitenConfig>): KaitenConfig {
-  const merged = readMergedEnv();
+  const { values: merged } = readMergedEnv();
 
   return {
     apiUrl: merged.KAITEN_API_URL ?? '',
@@ -78,18 +96,59 @@ function buildConfig(overrides: Partial<KaitenConfig>): KaitenConfig {
   };
 }
 
+export class KaitenConfigError extends Error {
+  constructor(readonly code: 'MISSING_CONFIGURATION' | 'INVALID_CONFIGURATION', message: string) {
+    super(message);
+    this.name = 'KaitenConfigError';
+  }
+}
+
 function requireCredentials(config: KaitenConfig): void {
-  if (config.apiUrl && config.apiToken) return;
+  if (config.apiUrl && config.apiToken) {
+    if (normalizeOrigin(config.apiUrl)) return;
+    throw new KaitenConfigError('INVALID_CONFIGURATION', 'KAITEN_API_URL must be an absolute http(s) URL without credentials.');
+  }
   const missing = [!config.apiUrl ? 'KAITEN_API_URL' : null, !config.apiToken ? 'KAITEN_API_TOKEN' : null]
     .filter((v): v is string => v !== null)
     .join(', ');
-  throw new Error(
+  throw new KaitenConfigError(
+    'MISSING_CONFIGURATION',
     `Missing required Kaiten configuration: ${missing}. ` +
       `Get an API token in Kaiten (Profile settings -> API tokens), then set the variables via ` +
       `environment (for MCP clients: the "env" block of the server entry in the MCP config), ` +
-      `<cwd>/.kaiten.env, <cwd>/.env, or ~/.kaiten/config. ` +
+      `KAITEN_CONFIG_FILE=/absolute/path/to/file, <cwd>/.kaiten.env, <cwd>/.env, or ~/.kaiten/config. ` +
       `AI agents: relay this to the user - the kaiten-mcp server cannot work until ${missing} ${missing.includes(',') ? 'are' : 'is'} configured.`
   );
+}
+
+function normalizeOrigin(value: string): string | null {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+    url.username = '';
+    url.password = '';
+    return `${url.protocol}//${url.host}${url.pathname}`.replace(/\/$/, '');
+  } catch {
+    return null;
+  }
+}
+
+/** Safe configuration status for diagnostics and the read-only health tool. */
+export function inspectConfig(): KaitenConfigHealth {
+  const cwd = process.cwd();
+  try {
+    const merged = readMergedEnv();
+    const apiUrl = merged.values.KAITEN_API_URL ?? '';
+    const apiToken = merged.values.KAITEN_API_TOKEN ?? '';
+    const origin = normalizeOrigin(apiUrl);
+    const actions: string[] = [];
+    if (!apiUrl) actions.push('Set KAITEN_API_URL via the MCP env block or KAITEN_CONFIG_FILE.');
+    else if (!origin) actions.push('Set KAITEN_API_URL to an absolute http(s) URL without credentials.');
+    if (!apiToken) actions.push('Set KAITEN_API_TOKEN via the MCP env block or KAITEN_CONFIG_FILE.');
+    return { cwd, apiUrl: { present: !!apiUrl, source: merged.sources.KAITEN_API_URL ?? null, origin }, apiToken: { present: !!apiToken, source: merged.sources.KAITEN_API_TOKEN ?? null }, ready: !!apiUrl && !!apiToken && !!origin, actions };
+  } catch (_error) {
+    return { cwd, apiUrl: { present: false, source: null, origin: null }, apiToken: { present: false, source: null }, ready: false, actions: ['Fix KAITEN_CONFIG_FILE: use an absolute path to a readable config file.'], errorCode: 'INVALID_CONFIGURATION' };
+  }
 }
 
 /**

@@ -3,7 +3,7 @@ export type { CardBlocker } from './blocker';
 export type { Card, CardFile, Checklist, ChecklistItem, Tag } from './card';
 export type { CardType, CustomProperty } from './company';
 export type { Comment } from './comment';
-export type { KaitenConfig } from './config';
+export type { ConfigSource, KaitenConfig, KaitenConfigHealth } from './config';
 export type { HttpTransport, QueryParams } from './http';
 export type { ExternalLink } from './link';
 export type {
