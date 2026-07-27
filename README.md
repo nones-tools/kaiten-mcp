@@ -34,6 +34,8 @@ Use the local executable and set `cwd` explicitly so file-based configuration is
 
 The same entry shape works in Codex Desktop, Claude Code/Claude Desktop and Cursor; place it in that client's MCP configuration file. You may instead use `npx -y @nones/kaiten-mcp mcp` as `command`/`args` where a local dependency is not desired.
 
+Codex Desktop exposes these tools in task chats. After updating the package or MCP configuration, restart Codex Desktop and begin a new chat so it refreshes `tools/list`.
+
 Run `kaiten_health` after connecting to verify only safe metadata (sources, readiness and normalized API origin).
 
 ## Secret safety

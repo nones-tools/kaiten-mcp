@@ -5,6 +5,14 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+### Fixed
+
+- MCP tools now advertise `execution.taskSupport: "optional"` through the SDK's
+  low-level server API. Codex Desktop can therefore add all Kaiten tools to task-chat
+  context; restart the MCP client and open a new chat after updating.
+
 ## 4.2.0 — 2026-07-27
 
 ### Added

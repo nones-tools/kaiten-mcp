@@ -1,8 +1,10 @@
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
 import type { ToolContext } from '../interfaces';
 import { loadConfigLenient } from '../kaiten';
 import { KaitenSDK } from '../sdk';
@@ -39,9 +41,7 @@ export function readVersion(): string {
  * Resolves once the transport is connected; the process then stays alive on
  * the open stdin stream until the MCP client closes it.
  */
-export async function startMcpServer(): Promise<void> {
-  console.error(`MCP Server starting with log level: ${logLevel}`);
-
+export function createMcpServer(): Server {
   // The SDK is instantiated lazily on first tool call (inside the hook chain,
   // so a missing-config error surfaces through the error hook) - `tools/list`
   // must work even when Kaiten credentials are not configured yet.
@@ -54,7 +54,7 @@ export async function startMcpServer(): Promise<void> {
   }
 
   const version = readVersion();
-  const server = new McpServer({ name: SERVER_NAME, version });
+  const server = new Server({ name: SERVER_NAME, version }, { capabilities: { tools: { listChanged: true } } });
 
   // `loadConfigLenient()` never throws on missing credentials - `tools/list`
   // must work before `KAITEN_API_URL`/`KAITEN_API_TOKEN` are configured, so
@@ -68,30 +68,42 @@ export async function startMcpServer(): Promise<void> {
     );
   }
 
-  // Every tool call runs through the middleware chain: logging wraps error
-  // formatting wraps the terminal handler (chain of responsibility).
-  for (const tool of registeredTools) {
+  const toolSchemas = new Map(registeredTools.map((tool) => [tool.name, z.object(tool.inputSchema)]));
+
+  // Low-level registration is intentional: McpServer.registerTool() in SDK
+  // 1.29.0 hardcodes `taskSupport: forbidden`, which hides tools from Codex
+  // task chats. These handlers preserve the same schemas and call middleware.
+  server.setRequestHandler(ListToolsRequestSchema, () => ({
+    tools: registeredTools.map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      inputSchema: z.toJSONSchema(toolSchemas.get(tool.name)!, { target: 'draft-07' }),
+      ...(tool.annotations ? { annotations: tool.annotations } : {}),
+      execution: { taskSupport: 'optional' as const },
+    })),
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const tool = registeredTools.find((candidate) => candidate.name === request.params.name);
+    if (!tool) throw new Error(`Tool ${request.params.name} not found`);
+    const args = toolSchemas.get(tool.name)!.parse(request.params.arguments ?? {});
     const runTool = compose([loggingHook, errorHook], async (ctx) => {
       const result = await tool.handler(tool.requiresSdk === false ? (undefined as never) : getSdk(), ctx.args ?? {});
       ctx.response = {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       };
     });
+    const ctx: ToolContext = { toolName: tool.name, args };
+    await runTool(ctx);
+    return ctx.response!;
+  });
 
-    server.registerTool(
-      tool.name,
-      {
-        description: tool.description,
-        inputSchema: tool.inputSchema,
-        ...(tool.annotations ? { annotations: tool.annotations } : {}),
-      },
-      async (args: any) => {
-        const ctx: ToolContext = { toolName: tool.name, args };
-        await runTool(ctx);
-        return ctx.response!;
-      }
-    );
-  }
+  return server;
+}
+
+export async function startMcpServer(): Promise<void> {
+  console.error(`MCP Server starting with log level: ${logLevel}`);
+  const server = createMcpServer();
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
