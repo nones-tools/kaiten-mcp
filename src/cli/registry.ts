@@ -1,5 +1,5 @@
 import type { CliCommand } from '../interfaces';
-import { assignCommand, boardCommand, cardCommand, cardsCommand, cardSimpleCommand, columnCommand, commentCommand, createCommand, deleteCommand, findCommand, gitBranchCommand, gitCheckoutCommand, gitCommitCommand, gitPushCommand, gitStatusCommand, helpCommand, mcpCommand, moveCommand, simpleCommand, subtaskCommand, tagCommand, updateCommand, userCommand } from './commands';
+import { assignCommand, boardCommand, cardCommand, cardsCommand, cardSimpleCommand, columnCommand, commentCommand, createCommand, deleteCommand, findCommand, gitBranchCommand, gitCheckoutCommand, gitCommitCommand, gitPushCommand, gitStatusCommand, helpCommand, initCommand, mcpCommand, moveCommand, simpleCommand, subtaskCommand, tagCommand, updateCommand, userCommand } from './commands';
 
 /** Every CLI command, in help-text order. Adding a command = one entry here + its module. */
 export const commands: CliCommand[] = [
@@ -24,6 +24,7 @@ export const commands: CliCommand[] = [
   gitCommitCommand,
   gitPushCommand,
   gitStatusCommand,
+  initCommand,
   mcpCommand,
   helpCommand,
 ];

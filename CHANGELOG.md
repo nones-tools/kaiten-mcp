@@ -5,6 +5,15 @@ All notable changes to `@nones/kaiten-mcp` are documented here. Versioning follo
 required-ness/type changes) bump the major version; new tools and new optional params are
 additive and ship in a minor version (constitution Principle IV, amended 1.1.0).
 
+## Unreleased
+
+### Added
+
+- `kaiten init` imports the API URL and token from the normal environment/`.env`
+  precedence and stores them securely in `~/.kaiten/config`. This makes the recommended
+  `npx -y @nones/kaiten-mcp mcp` setup independent of an MCP host's `PWD`, without shell
+  wrappers or custom credential paths.
+
 ## 4.2.1 — 2026-07-27
 
 ### Fixed

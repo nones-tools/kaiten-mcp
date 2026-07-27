@@ -3,9 +3,37 @@
 Settings are merged from the following sources, highest precedence first:
 
 1. Environment variables (`process.env`) — this is what MCP clients' `env` blocks set
-2. `./.kaiten.env` — per-project settings, safe to commit (IDs only, no secrets)
-3. `./.env`
-4. `~/.kaiten/config` — global settings, the right place for your token
+2. `KAITEN_CONFIG_FILE` — advanced explicit file override
+3. `./.kaiten.env` — per-project settings, safe to commit (IDs only, no secrets)
+4. `./.env`
+5. `~/.kaiten/config` — global settings, the right place for your token
+
+## One-time MCP initialization
+
+When the URL and token already exist in the current project's `.env` (or in the current
+process environment), run:
+
+```bash
+npx -y @nones/kaiten-mcp init
+```
+
+The command uses the same precedence described below and copies only `KAITEN_API_URL` and
+`KAITEN_API_TOKEN` to `~/.kaiten/config`. Existing defaults, guardrails, and comments in
+that file are preserved. The file is written atomically with mode `0600`, and the token is
+never printed.
+
+After initialization, stdio MCP clients can start the server without an `env`, `cwd`, or
+`KAITEN_CONFIG_FILE` entry:
+
+```json
+{
+  "command": "npx",
+  "args": ["-y", "@nones/kaiten-mcp", "mcp"]
+}
+```
+
+This avoids relying on the MCP host's inherited `PWD`. An explicit `cwd` is still needed
+when optional project-local values must be read from `.kaiten.env` or `.env`.
 
 ## Configuration precedence
 
@@ -19,7 +47,9 @@ Higher rows override lower rows for each variable independently:
 | 4 | `<cwd>/.env` |
 | 5 | `~/.kaiten/config` |
 
-`KAITEN_CONFIG_FILE` must point to a readable file. A missing or inaccessible path produces a safe `INVALID_CONFIGURATION` diagnostic; its contents are never logged. Set an explicit MCP `cwd` when using project files.
+`KAITEN_CONFIG_FILE` is an advanced override and must point to a readable file. A missing
+or inaccessible path produces a safe `INVALID_CONFIGURATION` diagnostic; its contents are
+never logged. Set an explicit MCP `cwd` only when using project files at runtime.
 
 All files use plain `KEY=VALUE` lines; `#` starts a comment.
 

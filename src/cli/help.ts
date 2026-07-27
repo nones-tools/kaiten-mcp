@@ -38,6 +38,7 @@ Kaiten CLI - Полнофункциональный CLI для Kaiten API
   find <tag_name> [-m] [--board=<id|name>]  - Поиск по метке (-m = минимальный JSON, --board = фильтр по ID или названию доски)
 
 MCP-сервер:
+  init                           - Сохранить credentials из текущего env/.env в ~/.kaiten/config
   mcp                            - Запустить stdio MCP-сервер для ИИ-агентов
 
 Команды для Git:

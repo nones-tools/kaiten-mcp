@@ -54,15 +54,19 @@ Key decisions (ADR-style):
   runtime deps to `@modelcontextprotocol/sdk` + `zod`.
 - **D2. Bun toolchain, Node runtime**: built/tested with Bun, published bundle runs on
   plain Node >= 18 (`--target node --packages external`).
-- **D3. Config precedence**: `process.env` > `./.kaiten.env` > `./.env` >
-  `~/.kaiten/config`; missing required vars produce an error explicitly designed to be
-  relayed by an AI agent to its human.
+- **D3. Config precedence**: `process.env` > `KAITEN_CONFIG_FILE` >
+  `./.kaiten.env` > `./.env` > `~/.kaiten/config`; missing required vars produce an
+  error explicitly designed to be relayed by an AI agent to its human.
 - **D4. Kaiten Core extraction (standing, not yet executed)**: `src/kaiten/` will move to
   a standalone `@nones/kaiten-core` package; this repo keeps the MCP/CLI/SDK layers and
   takes the core as a dependency. Until then the core stays import-isolated. Beads epic:
   `kaiten-mcp-jtg`.
 - **D5. Contract freeze**: tool names/schemas, CLI output and root exports are contracts
   (constitution, Principle IV); breaking them requires a major version bump.
+- **D6. PWD-independent MCP credentials**: `kaiten init` reads credentials through D3
+  from the user's current shell/project and persists only the API URL and token in
+  `~/.kaiten/config` with restrictive permissions. Normal stdio MCP startup therefore
+  requires neither an inherited project `PWD` nor a custom credential-file path.
 
 ## Out of Scope (current)
 

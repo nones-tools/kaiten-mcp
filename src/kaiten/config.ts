@@ -115,8 +115,8 @@ function requireCredentials(config: KaitenConfig): void {
     'MISSING_CONFIGURATION',
     `Missing required Kaiten configuration: ${missing}. ` +
       `Get an API token in Kaiten (Profile settings -> API tokens), then set the variables via ` +
-      `environment (for MCP clients: the "env" block of the server entry in the MCP config), ` +
-      `KAITEN_CONFIG_FILE=/absolute/path/to/file, <cwd>/.kaiten.env, <cwd>/.env, or ~/.kaiten/config. ` +
+      `npx -y @nones/kaiten-mcp init from a directory containing .env, environment, ` +
+      `<cwd>/.kaiten.env, <cwd>/.env, or ~/.kaiten/config. ` +
       `AI agents: relay this to the user - the kaiten-mcp server cannot work until ${missing} ${missing.includes(',') ? 'are' : 'is'} configured.`
   );
 }
@@ -142,9 +142,9 @@ export function inspectConfig(): KaitenConfigHealth {
     const apiToken = merged.values.KAITEN_API_TOKEN ?? '';
     const origin = normalizeOrigin(apiUrl);
     const actions: string[] = [];
-    if (!apiUrl) actions.push('Set KAITEN_API_URL via the MCP env block or KAITEN_CONFIG_FILE.');
+    if (!apiUrl) actions.push('Run npx -y @nones/kaiten-mcp init with KAITEN_API_URL available.');
     else if (!origin) actions.push('Set KAITEN_API_URL to an absolute http(s) URL without credentials.');
-    if (!apiToken) actions.push('Set KAITEN_API_TOKEN via the MCP env block or KAITEN_CONFIG_FILE.');
+    if (!apiToken) actions.push('Run npx -y @nones/kaiten-mcp init with KAITEN_API_TOKEN available.');
     return { cwd, apiUrl: { present: !!apiUrl, source: merged.sources.KAITEN_API_URL ?? null, origin }, apiToken: { present: !!apiToken, source: merged.sources.KAITEN_API_TOKEN ?? null }, ready: !!apiUrl && !!apiToken && !!origin, actions };
   } catch (_error) {
     return { cwd, apiUrl: { present: false, source: null, origin: null }, apiToken: { present: false, source: null }, ready: false, actions: ['Fix KAITEN_CONFIG_FILE: use an absolute path to a readable config file.'], errorCode: 'INVALID_CONFIGURATION' };
@@ -153,7 +153,8 @@ export function inspectConfig(): KaitenConfigHealth {
 
 /**
  * Loads Kaiten configuration, merging (lowest to highest precedence):
- * `~/.kaiten/config` -> `<cwd>/.env` -> `<cwd>/.kaiten.env` -> `process.env`.
+ * `~/.kaiten/config` -> `<cwd>/.env` -> `<cwd>/.kaiten.env` ->
+ * `KAITEN_CONFIG_FILE` -> `process.env`.
  * `overrides` wins over all sources (used by tests / explicit callers).
  * No caching: cheap to call repeatedly, always reflects current env/files.
  *

@@ -7,10 +7,21 @@ npm install -g @nones/kaiten-mcp   # installs the single `kaiten` binary
 Configuration is the same as for the MCP server — see [configuration.md](configuration.md).
 Run `kaiten help` for the built-in reference (currently in Russian).
 
+## Initialization
+
+```bash
+npx -y @nones/kaiten-mcp init
+```
+
+Run this once from a project whose `.env` contains `KAITEN_API_URL` and
+`KAITEN_API_TOKEN`. It saves those two credentials to `~/.kaiten/config` with mode `0600`,
+so MCP clients can start through `npx` without an `env`, `cwd`, or custom credential path.
+Existing global defaults and guardrails are preserved.
+
 ## MCP server
 
 ```bash
-kaiten mcp                       # start the stdio MCP server (blocks; run by MCP clients, not by hand)
+npx -y @nones/kaiten-mcp mcp    # start the stdio MCP server (blocks; run by MCP clients)
 ```
 
 `kaiten mcp` is how MCP clients launch the server since v4.0.0 (the separate `kaiten-mcp`

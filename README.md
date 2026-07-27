@@ -7,42 +7,10 @@ cards, comments, tags, checklists, files and card-scoped git branches. Ships as 
 CLI; a typed SDK is exported for programmatic use.
 
 > **Migrating from v3?** The separate `kaiten-mcp` binary was removed in v4.0.0 — append
-> `mcp` to the command in your MCP config: prefer the project-local binary `kaiten mcp`; `npx -y @nones/kaiten-mcp mcp` remains supported.
+> `mcp` to the command in your MCP config and launch it with
+> `npx -y @nones/kaiten-mcp mcp`.
 
-## MCP clients (project-local install)
-
-Install once in the project that owns the integration:
-
-```sh
-npm install -D @nones/kaiten-mcp
-```
-
-Use the local executable and set `cwd` explicitly so file-based configuration is deterministic:
-
-```json
-{
-  "mcpServers": {
-    "kaiten": {
-      "command": "./node_modules/.bin/kaiten",
-      "args": ["mcp"],
-      "cwd": "/absolute/path/to/project",
-      "env": { "KAITEN_CONFIG_FILE": "/absolute/path/to/kaiten.env" }
-    }
-  }
-}
-```
-
-The same entry shape works in Codex Desktop, Claude Code/Claude Desktop and Cursor; place it in that client's MCP configuration file. You may instead use `npx -y @nones/kaiten-mcp mcp` as `command`/`args` where a local dependency is not desired.
-
-Codex Desktop exposes these tools in task chats. After updating the package or MCP configuration, restart Codex Desktop and begin a new chat so it refreshes `tools/list`.
-
-Run `kaiten_health` after connecting to verify only safe metadata (sources, readiness and normalized API origin).
-
-## Secret safety
-
-Tokens and config-file contents are never returned by `kaiten_health`, MCP errors, or diagnostics. Prefer an MCP client `env` block or a permissions-restricted `KAITEN_CONFIG_FILE`; do not put tokens in URLs.
-
-## Setup
+## MCP clients (recommended setup)
 
 You need two values:
 
@@ -51,7 +19,51 @@ You need two values:
 | `KAITEN_API_URL` | `https://<kaiten_url>/api/latest` |
 | `KAITEN_API_TOKEN` | Kaiten → Profile settings → API tokens → Create token |
 
-**Claude Code:**
+If they already live in the project's `.env`, initialize Kaiten once from that project:
+
+```sh
+npx -y @nones/kaiten-mcp init
+```
+
+`init` reads the existing runtime sources (`process.env`, `.kaiten.env`, `.env`, or an
+existing global config), then saves only the API URL and token to `~/.kaiten/config` with
+file mode `0600`. It does not print the token. Keep `.env` out of version control.
+
+The MCP entry then needs no credential paths, shell wrapper, or project working directory:
+
+```json
+{
+  "mcpServers": {
+    "kaiten": {
+      "command": "npx",
+      "args": ["-y", "@nones/kaiten-mcp", "mcp"]
+    }
+  }
+}
+```
+
+The same entry shape works in Codex Desktop, Claude Code/Claude Desktop and Cursor; place
+it in that client's MCP configuration file.
+
+> **Codex and `PWD`:** Codex may start the MCP process with a working directory different
+> from your project. Credentials saved by `init` do not depend on `PWD`. Set an explicit
+> absolute `cwd` only if you intentionally keep optional project-specific defaults in
+> `./.kaiten.env` or `./.env`; do not rely on the inherited `PWD` for those files.
+
+Codex Desktop exposes these tools in task chats. After updating the package or MCP configuration, restart Codex Desktop and begin a new chat so it refreshes `tools/list`.
+
+Run `kaiten_health` after connecting to verify only safe metadata (sources, readiness and normalized API origin).
+
+## Secret safety
+
+Tokens and config-file contents are never returned by `kaiten_health`, MCP errors, or
+diagnostics. Prefer `kaiten init` or an MCP client secret store; do not put tokens in URLs
+or commit them to the repository.
+
+## Alternative: MCP-managed environment
+
+If you do not want a user-level `~/.kaiten/config`, pass credentials through the MCP
+client instead. For Claude Code:
 
 ```bash
 claude mcp add kaiten \
@@ -60,7 +72,7 @@ claude mcp add kaiten \
   -- npx -y @nones/kaiten-mcp mcp
 ```
 
-**Claude Desktop / Cursor / other clients** — add to the MCP config
+For Claude Desktop, Cursor, and other clients, add them to the MCP config
 (`claude_desktop_config.json`, `.cursor/mcp.json`, …):
 
 ```json
@@ -72,28 +84,6 @@ claude mcp add kaiten \
       "env": {
         "KAITEN_API_URL": "https://<kaiten_url>/api/latest",
         "KAITEN_API_TOKEN": "your_token"
-      }
-    }
-  }
-}
-```
-
-**Manual connection (token from a local `.env`)** — if you keep `KAITEN_API_TOKEN` in the
-project's `.env` and don't want it duplicated in the MCP config, wrap the server in a small
-shell command that reads the token at startup:
-
-```json
-{
-  "mcpServers": {
-    "kaiten": {
-      "transport": "stdio",
-      "command": "sh",
-      "args": [
-        "-c",
-        "token=\"$(sed -n 's/^KAITEN_API_TOKEN=//p' .env 2>/dev/null | head -n 1)\"; [ -n \"$token\" ] && export KAITEN_API_TOKEN=\"$token\"; exec npx -y @nones/kaiten-mcp mcp"
-      ],
-      "env": {
-        "KAITEN_API_URL": "https://<kaiten_url>/api/latest"
       }
     }
   }

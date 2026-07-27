@@ -80,6 +80,7 @@ describe('loadConfig', () => {
   it('throws a clear error naming both missing vars when apiUrl and apiToken are absent', () => {
     expect(() => loadConfig()).toThrow(/KAITEN_API_URL/);
     expect(() => loadConfig()).toThrow(/KAITEN_API_TOKEN/);
+    expect(() => loadConfig()).toThrow(/npx -y @nones\/kaiten-mcp init/);
   });
 
   it('throws naming only the still-missing var when one is already set', () => {

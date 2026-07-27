@@ -11,6 +11,16 @@ interface CliResult {
   stderr: string;
 }
 
+function cleanEnv(home: string): Record<string, string> {
+  const env: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value === undefined || key.startsWith('KAITEN_')) continue;
+    env[key] = value;
+  }
+  env.HOME = home;
+  return env;
+}
+
 // Spawns the CLI as a real subprocess (`bun src/cli/index.ts ...`) rather than
 // importing it directly, since the module calls process.exit() and runs
 // its logic at import time - importing it in-process would kill the test
@@ -20,16 +30,9 @@ interface CliResult {
 function runCli(args: string[]): CliResult {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'kaiten-cli-test-'));
   try {
-    const env: Record<string, string> = {};
-    for (const [key, value] of Object.entries(process.env)) {
-      if (value === undefined || key.startsWith('KAITEN_')) continue;
-      env[key] = value;
-    }
-    env.HOME = tmpDir;
-
     const result = Bun.spawnSync(['bun', CLI_PATH, ...args], {
       cwd: tmpDir,
-      env,
+      env: cleanEnv(tmpDir),
       stdout: 'pipe',
       stderr: 'pipe',
     });
@@ -60,6 +63,36 @@ describe('cli', () => {
       const { exitCode, stdout } = runCli([flag]);
       expect(exitCode).toBe(0);
       expect(stdout).toContain('Kaiten CLI - Полнофункциональный CLI для Kaiten API');
+    }
+  });
+
+  it('init imports credentials from the project .env into the global config', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'kaiten-cli-init-test-'));
+    const projectDir = path.join(tmpDir, 'project');
+    const homeDir = path.join(tmpDir, 'home');
+    fs.mkdirSync(projectDir);
+    fs.mkdirSync(homeDir);
+    fs.writeFileSync(
+      path.join(projectDir, '.env'),
+      'KAITEN_API_URL=https://team.kaiten.ru/api/latest\nKAITEN_API_TOKEN=secret\n'
+    );
+
+    try {
+      const result = Bun.spawnSync(['bun', CLI_PATH, 'init'], {
+        cwd: projectDir,
+        env: cleanEnv(homeDir),
+        stdout: 'pipe',
+        stderr: 'pipe',
+      });
+      const configPath = path.join(homeDir, '.kaiten', 'config');
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr.toString()).toBe('');
+      expect(result.stdout.toString()).toContain('MCP can now start with: npx -y @nones/kaiten-mcp mcp');
+      expect(result.stdout.toString()).not.toContain('secret');
+      expect(fs.readFileSync(configPath, 'utf8')).toContain('KAITEN_API_TOKEN=secret');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
 
