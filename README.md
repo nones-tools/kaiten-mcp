@@ -1,3 +1,7 @@
+[![Kaiten MCP — NONES](docs/assets/banner.png)](https://github.com/nones-tools/nones-mcp/tree/main/apps/kaiten)
+
+> **Current source and releases:** [Kaiten MCP in the Nones MCP monorepo](https://github.com/nones-tools/nones-mcp/tree/main/apps/kaiten).
+
 # @nones/kaiten-mcp
 
 MCP (Model Context Protocol) server for Kaiten — lets Claude Code,
